@@ -26,6 +26,8 @@ namespace qbat {
 	public:
 		CPowerManager(QObject * parent = 0);
 		~CPowerManager();
+	public slots:
+		void showAbout();
 	};
 }
 

@@ -18,6 +18,7 @@ namespace qbat {
 		m_DefaultTrayIcon(QIcon(UI_ICON_QBAT), this)
 	{
 		m_ContextMenu.addAction(tr("&Settings"))->setEnabled(false);
+		m_ContextMenu.addAction(tr("&About"), this, SLOT(showAbout()));
 		m_ContextMenu.addSeparator();
 		m_ContextMenu.addAction(tr("&Quit"), qApp, SLOT(quit()));
 		
@@ -77,5 +78,17 @@ namespace qbat {
 			m_DefaultTrayIcon.setToolTip("QBat - " + tr("no information available"));
 		
 		m_DefaultTrayIcon.setVisible(m_BatteryIcons.isEmpty());
+	}
+	
+	void CPowerManager::showAbout() {
+		QMessageBox aboutBox;
+		
+		aboutBox.setWindowIcon(QIcon(UI_ICON_QBAT));
+		aboutBox.setIconPixmap(QPixmap(UI_ICON_QBAT));
+		aboutBox.setWindowTitle(tr("About QBat"));
+		aboutBox.setText(UI_NAME + "\nv" + QString(UI_VERSION));
+		aboutBox.setStandardButtons(QMessageBox::Ok);
+		
+		aboutBox.exec();
 	}
 }
