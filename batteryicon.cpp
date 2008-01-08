@@ -49,7 +49,7 @@ namespace qbat {
 				qreal remainingTime  = (qreal)chargeNow / (qreal)currentNow;
 				int remainingHours   = (int)remainingTime;
 				int remainungMinutes = (int)(remainingTime * 60) % 60;
-				newToolTip += tr("remaining time: %1:%2").arg(remainingHours, 2, QChar('0')).arg(remainungMinutes, 2, QChar('0'));
+				newToolTip += tr("remaining time: %1:%2").arg(remainingHours, 2, 10, QChar('0')).arg(remainungMinutes, 2, 10, QChar('0'));
 			}
 		}
 		else if (status == "Charging")
