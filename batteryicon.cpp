@@ -70,30 +70,30 @@ namespace qbat {
 		newToolTip += tr("design capacity: %4mAh").arg(chargeFullDesign / 1000);
 		
 		setToolTip(newToolTip);
-		QPainter painter(&m_Icon);
+		m_Icon.fill(Qt::transparent);
 		
+		QPainter painter(&m_Icon);
 		
 		if (chargeNow != chargeFull) {
 			painter.setPen(Qt::black);
 			painter.setBrush(Qt::white);
-			painter.drawRect(0, 0, 31, 31);
+			painter.drawRect(0, 5, 31, 26);
 			
 			painter.setPen(Qt::NoPen);
 			painter.setBrush(Qt::green);
-			painter.drawRect(1, 1 + 30 - (int)(30.0 * chargeNow / chargeFull), 30, (int)(30.0 * chargeNow / chargeFull));
+			painter.drawRect(1, 6 + 25 - (int)(25.0 * chargeNow / chargeFull), 30, (int)(25.0 * chargeNow / chargeFull));
 			
 			painter.setPen(Qt::black);
 			painter.setBrush(Qt::yellow);
-			painter.drawRect(23, 0, 8, 8);
 		}
 		else {
 			painter.setPen(Qt::black);
 			painter.setBrush(Qt::green);
-			painter.drawRect(0, 0, 31, 31);
+			painter.drawRect(0, 5, 31, 26);
 			
 			painter.setBrush(Qt::blue);
-			painter.drawRect(23, 0, 8, 8);
 		}
+		painter.drawRect(9, 0, 13, 5);
 		
 		painter.setBrush(Qt::NoBrush);
 		painter.font().setPixelSize(16);
