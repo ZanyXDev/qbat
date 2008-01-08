@@ -1,6 +1,6 @@
 build
-
-qbat.kdevelop
-qbat.kdevses
+Makefile
+qbat
+qbat.kde*
 Doxyfile
-qbat.kdevelop.pcs
+

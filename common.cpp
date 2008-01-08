@@ -17,7 +17,6 @@ namespace qbat {
 		
 		inFile.open(fileName);
 		inFile >> buffer;
-		//getLine(inFile, buffer);
 		inFile.close();
 		
 		return buffer;
@@ -29,7 +28,6 @@ namespace qbat {
 		
 		inFile.open(fileName);
 		inFile >> buffer;
-		//getLine(inFile, buffer);
 		inFile.close();
 		
 		return buffer;

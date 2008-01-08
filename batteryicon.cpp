@@ -66,8 +66,7 @@ namespace qbat {
 		
 		newToolTip += tr("current capacity: %2mAh").arg(chargeNow / 1000) + '\n';
 		
-		if (status != "Full")
-			newToolTip += tr("last full capacity: %3mAh").arg(chargeFull / 1000) + '\n';
+		newToolTip += tr("last full capacity: %3mAh").arg(chargeFull / 1000) + '\n';
 		newToolTip += tr("design capacity: %4mAh").arg(chargeFullDesign / 1000);
 		
 		setToolTip(newToolTip);
