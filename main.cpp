@@ -15,13 +15,13 @@ int main(int argc, char * argv[])
 	app.installTranslator(&translator);
 	app.setQuitOnLastWindowClosed(false);
 	
-// 	{
-// 		QDir workdir(UI_PATH_WORK);
-// 		if (!workdir.exists()) {
-// 			workdir.cdUp();
-// 			workdir.mkdir(UI_DIR_WORK);
-// 		}
-// 	}
+	{
+		QDir workdir(UI_PATH_WORK);
+		if (!workdir.exists()) {
+			workdir.cdUp();
+			workdir.mkdir(UI_DIR_WORK);
+		}
+	}
 	
 	CPowerManager mainobject;
 	return app.exec();

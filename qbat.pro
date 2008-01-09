@@ -17,7 +17,8 @@ UI_DIR = ui/
 SOURCES += main.cpp \
  batteryicon.cpp \
  powermanager.cpp \
- common.cpp
+ common.cpp \
+ settings.cpp
 DESTDIR = .
 
 target.path = /usr/bin
@@ -33,6 +34,9 @@ INSTALLS += target iconstarget langtarget shortcuttarget
 HEADERS += constants.h \
 batteryicon.h \
 common.h \
-powermanager.h
+powermanager.h \
+ settings.h
 TARGET = qbat
+
+FORMS += settingsdialog.ui
 

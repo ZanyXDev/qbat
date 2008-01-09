@@ -11,18 +11,21 @@
 #include <QSystemTrayIcon>
 
 namespace qbat {
+	class Settings;
+	
 	class CBatteryIcon : public QSystemTrayIcon {
 		Q_OBJECT
 	private:
 		QString m_BatteryName;
 		QPixmap m_Icon;
+		Settings * m_Settings;
 	public:
-		CBatteryIcon(QString batteryName, QMenu * contextMenu, QObject * parent = 0);
+		CBatteryIcon(QString batteryName, Settings * settings, QMenu * contextMenu, QObject * parent = 0);
 		~CBatteryIcon();
 		
 		QString batteryName() const { return m_BatteryName; }
 		
-		void updateData();
+		void updateData(int chargeFull, int chargeFullDesign, int chargeNow, int currentNow, int status);
 	};
 }
 

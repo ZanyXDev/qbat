@@ -11,22 +11,39 @@
 #include <QHash>
 #include <QDir>
 #include <QMenu>
-#include "batteryicon.h"
+#include <QSettings>
+#include <QSystemTrayIcon>
+#include "common.h"
 
 namespace qbat {
+	class CBatteryIcon;
+	
 	class CPowerManager : public QObject {
 		Q_OBJECT
 	private:
-		void timerEvent(QTimerEvent * event);
 		int m_Timer;
 		QDir m_SysfsDir;
+		
+		Settings m_Settings;
+		QSettings m_SettingsFile;
+		
 		QMenu m_ContextMenu;
+		
 		QHash<QString, CBatteryIcon *> m_BatteryIcons;
 		QSystemTrayIcon m_DefaultTrayIcon;
+		
+		void timerEvent(QTimerEvent * event);
+		
+		inline void readSettings();
+		inline void writeSettings();
 	public:
 		CPowerManager(QObject * parent = 0);
 		~CPowerManager();
+	private slots:
+		void updateData();
+		void restartTimer();
 	public slots:
+		void showSettings();
 		void showAbout();
 	};
 }

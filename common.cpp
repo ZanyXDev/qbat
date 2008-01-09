@@ -32,4 +32,15 @@ namespace qbat {
 		
 		return buffer;
 	}
+	
+	int toStatusInt(std::string status) {
+		if (status == "Discharging")
+			return UI_BATTERY_DISCHARGING;
+		else if (status == "Charging")
+			return UI_BATTERY_CHARGING;
+		else if (status == "Full")
+			return UI_BATTERY_FULL;
+		else
+			return 0;
+	}
 }

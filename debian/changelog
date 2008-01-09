@@ -1,3 +1,15 @@
+qbat (0.1.0) unstable; urgency=low
+
+  * New icon for batterys
+  * Added handling for critical battery capacity
+    - Show warning or execute a command
+  * Added settings dialog
+  * Added customizable battery icon colors
+  * Added customizable polling rate
+  * Batterys can now be merged to one virtual battery
+
+ -- Oliver Groß <oliver@mobic>  Wed, 09 Jan 2008 16:58:07 +0100
+
 qbat (0.0.1) unstable; urgency=low
 
   * Initial Release.

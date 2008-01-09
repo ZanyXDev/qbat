@@ -14,35 +14,32 @@
 namespace qbat {
 	using namespace std;
 	
-	CBatteryIcon::CBatteryIcon(QString batteryName, QMenu * contextMenu, QObject * parent) :
+	CBatteryIcon::CBatteryIcon(QString batteryName, Settings * settings, QMenu * contextMenu, QObject * parent) :
 		QSystemTrayIcon(parent),
 		m_BatteryName(batteryName),
-		m_Icon(32, 32)
+		m_Icon(32, 32),
+		m_Settings(settings)
 	{
 		m_Icon.fill(Qt::transparent);
+		setIcon(m_Icon);
 		setContextMenu(contextMenu);
-		updateData();
+		//updateData();
 		show();
 	}
 	
 	CBatteryIcon::~CBatteryIcon() {
 	}
 	
-	void CBatteryIcon::updateData() {
-		QDir workDir(UI_PATH_SYSFS_DIR + ('/' + m_BatteryName));
-		int chargeFull       = readIntSysFile(workDir.filePath("charge_full").toAscii().constData());
-		int chargeFullDesign = readIntSysFile(workDir.filePath("charge_full_design").toAscii().constData());
-		int chargeNow        = readIntSysFile(workDir.filePath("charge_now").toAscii().constData());
-		int currentNow       = readIntSysFile(workDir.filePath("current_now").toAscii().constData());
-		string status        = readStringSysFile(workDir.filePath("status").toAscii().constData());
-		
+	void CBatteryIcon::updateData(int chargeFull, int chargeFullDesign, int chargeNow, int currentNow, int status) {
 		QString newToolTip = tr("QBat - %1: %2%").arg(m_BatteryName) +'\n';
+		
 		if (chargeFull)
 			newToolTip = newToolTip.arg((int)(100.0 * chargeNow / chargeFull));
 		else
 			newToolTip = newToolTip.arg('-');
 		
-		if (status == "Discharging") {
+		switch (status) {
+		case UI_BATTERY_DISCHARGING:
 			newToolTip += tr("status: %1").arg(tr("dischaging"));
 			if (currentNow) {
 				newToolTip += '\n';
@@ -51,23 +48,29 @@ namespace qbat {
 				int remainungMinutes = (int)(remainingTime * 60) % 60;
 				newToolTip += tr("remaining time: %1:%2").arg(remainingHours, 2, 10, QChar('0')).arg(remainungMinutes, 2, 10, QChar('0'));
 			}
-		}
-		else if (status == "Charging")
+			break;
+		case UI_BATTERY_CHARGING:
 			newToolTip += tr("status: %1").arg(tr("charging"));
-		else if (status == "Full")
+			break;
+		case UI_BATTERY_FULL:
 			newToolTip += tr("status: %1").arg(tr("full"));
-		else
+			break;
+		default:
 			newToolTip += tr("status: %1").arg(tr("unknown"));
-		
+			break;
+		}
 		newToolTip += '\n';
 		
-		if (status != "Full")
+		if (status != UI_BATTERY_FULL)
 			newToolTip += tr("current rate: %1A").arg(qRound(currentNow / 100000.0) / 10.0) + '\n';
 		
 		newToolTip += tr("current capacity: %2mAh").arg(chargeNow / 1000) + '\n';
 		
-		newToolTip += tr("last full capacity: %3mAh").arg(chargeFull / 1000) + '\n';
-		newToolTip += tr("design capacity: %4mAh").arg(chargeFullDesign / 1000);
+		if (chargeFull)
+			newToolTip += tr("last full capacity: %3mAh").arg(chargeFull / 1000) + '\n';
+		
+		if (chargeFullDesign)
+			newToolTip += tr("design capacity: %4mAh").arg(chargeFullDesign / 1000);
 		
 		setToolTip(newToolTip);
 		m_Icon.fill(Qt::transparent);
@@ -75,23 +78,23 @@ namespace qbat {
 		QPainter painter(&m_Icon);
 		
 		if (chargeNow != chargeFull) {
-			painter.setPen(Qt::black);
-			painter.setBrush(Qt::white);
+			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN]));
+			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_EMPTY]));
 			painter.drawRect(0, 5, 31, 26);
 			
 			painter.setPen(Qt::NoPen);
-			painter.setBrush(Qt::green);
+			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_CHARGED]));
 			painter.drawRect(1, 6 + 25 - (int)(25.0 * chargeNow / chargeFull), 30, (int)(25.0 * chargeNow / chargeFull));
 			
-			painter.setPen(Qt::black);
-			painter.setBrush(Qt::yellow);
+			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN]));
+			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_POLE]));
 		}
 		else {
-			painter.setPen(Qt::black);
-			painter.setBrush(Qt::green);
+			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN_FULL]));
+			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_FULL]));
 			painter.drawRect(0, 5, 31, 26);
 			
-			painter.setBrush(Qt::blue);
+			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_POLE_FULL]));
 		}
 		painter.drawRect(9, 0, 13, 5);
 		

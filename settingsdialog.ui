@@ -1,0 +1,315 @@
+<ui version="4.0" >
+ <class>settingsDialog</class>
+ <widget class="QDialog" name="settingsDialog" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>455</width>
+    <height>410</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>QBat - Settings</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset>../../../../usr/share/qbat/icons/qbat.svg</iconset>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <widget class="QGroupBox" name="criticalGroup" >
+     <property name="title" >
+      <string>Event for critical battery capacity</string>
+     </property>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
+     <property name="checked" >
+      <bool>false</bool>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="criticalCapacitylabel" >
+        <property name="text" >
+         <string>Critical capacity (in %)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="3" >
+       <widget class="QSpinBox" name="criticalCapacitySpin" >
+        <property name="minimum" >
+         <number>1</number>
+        </property>
+        <property name="maximum" >
+         <number>99</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QRadioButton" name="criticalWarningRadio" >
+        <property name="text" >
+         <string>Show warning message</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item rowspan="2" row="2" column="0" >
+       <widget class="QRadioButton" name="criticalCommandRadio" >
+        <property name="text" >
+         <string>Execute command</string>
+        </property>
+       </widget>
+      </item>
+      <item rowspan="2" row="2" column="1" colspan="3" >
+       <widget class="QLineEdit" name="criticalCommandEdit" >
+        <property name="enabled" >
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="batteryIconGroup" >
+     <property name="title" >
+      <string>Battery icon(s)</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="mainColorLabel" >
+        <property name="text" >
+         <string>Main color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QToolButton" name="mainFullColorButton" >
+        <property name="toolTip" >
+         <string>full</string>
+        </property>
+        <property name="text" >
+         <string>full</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3" >
+       <widget class="QToolButton" name="mainChargedColorButton" >
+        <property name="toolTip" >
+         <string>charged</string>
+        </property>
+        <property name="text" >
+         <string>charged</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4" >
+       <widget class="QToolButton" name="mainEmptyColorButton" >
+        <property name="toolTip" >
+         <string>empty</string>
+        </property>
+        <property name="text" >
+         <string>empty</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="textColorLabel" >
+        <property name="text" >
+         <string>Text color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" >
+       <widget class="QToolButton" name="textFullColorButton" >
+        <property name="toolTip" >
+         <string>full</string>
+        </property>
+        <property name="text" >
+         <string>full</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3" >
+       <widget class="QToolButton" name="textColorButton" >
+        <property name="toolTip" >
+         <string>(dis)charging</string>
+        </property>
+        <property name="text" >
+         <string>(dis)charging</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="poleLabel" >
+        <property name="text" >
+         <string>"+ pole" color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" >
+       <widget class="QToolButton" name="poleFullColorButton" >
+        <property name="toolTip" >
+         <string>full</string>
+        </property>
+        <property name="text" >
+         <string>full</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3" >
+       <widget class="QToolButton" name="poleColorButton" >
+        <property name="toolTip" >
+         <string>(dis)charging</string>
+        </property>
+        <property name="text" >
+         <string>(dis)charging</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="4" >
+       <widget class="QCheckBox" name="mergeBatteryCheck" >
+        <property name="text" >
+         <string>Merge battery icons to one virtual battery</string>
+        </property>
+       </widget>
+      </item>
+      <item rowspan="3" row="0" column="1" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QLabel" name="pollingRateLabel" >
+       <property name="text" >
+        <string>Polling rate (in milliseconds)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="pollingRateSpin" >
+       <property name="minimum" >
+        <number>100</number>
+       </property>
+       <property name="maximum" >
+        <number>20000</number>
+       </property>
+       <property name="singleStep" >
+        <number>100</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>437</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons" >
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+     </property>
+     <property name="centerButtons" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>criticalGroup</tabstop>
+  <tabstop>criticalCapacitySpin</tabstop>
+  <tabstop>criticalWarningRadio</tabstop>
+  <tabstop>criticalCommandRadio</tabstop>
+  <tabstop>criticalCommandEdit</tabstop>
+  <tabstop>mainFullColorButton</tabstop>
+  <tabstop>mainChargedColorButton</tabstop>
+  <tabstop>mainEmptyColorButton</tabstop>
+  <tabstop>textFullColorButton</tabstop>
+  <tabstop>textColorButton</tabstop>
+  <tabstop>poleFullColorButton</tabstop>
+  <tabstop>poleColorButton</tabstop>
+  <tabstop>mergeBatteryCheck</tabstop>
+  <tabstop>pollingRateSpin</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>settingsDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>227</x>
+     <y>383</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>settingsDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>295</x>
+     <y>389</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>criticalCommandRadio</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>criticalCommandEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>172</x>
+     <y>112</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>208</x>
+     <y>112</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
