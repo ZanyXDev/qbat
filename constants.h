@@ -1,7 +1,7 @@
 #ifndef QBAT_CONSTANTS_H
 #define QBAT_CONSTANTS_H
 
-#define UI_VERSION                      "0.0.1"
+#define UI_VERSION                      "0.1.0"
 #define UI_NAME                         tr("QBat - Qt Battery Monitor")
 
 #define UI_DIR_WORK                     ".qbat/"
