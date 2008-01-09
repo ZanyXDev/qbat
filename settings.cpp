@@ -26,6 +26,7 @@ namespace qbat {
 	}
 	
 	void CSettings::applySettings() {
+		m_Settings->handleCritical = ui.criticalGroup->isChecked();
 		m_Settings->criticalCapacity = ui.criticalCapacitySpin->value();
 		m_Settings->executeCommand = ui.criticalCommandRadio->isChecked();
 		m_Settings->mergeBatterys = ui.mergeBatteryCheck->isChecked();
@@ -38,6 +39,7 @@ namespace qbat {
 	}
 	
 	bool CSettings::execute(Settings * settings) {
+		ui.criticalGroup->setChecked(settings->handleCritical);
 		ui.criticalCapacitySpin->setValue(settings->criticalCapacity);
 		ui.criticalCommandRadio->setChecked(settings->executeCommand);
 		ui.mergeBatteryCheck->setChecked(settings->mergeBatterys);
