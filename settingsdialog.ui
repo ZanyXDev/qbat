@@ -13,7 +13,7 @@
    <string>QBat - Settings</string>
   </property>
   <property name="windowIcon" >
-   <iconset>../../../../usr/share/qbat/icons/qbat.svg</iconset>
+   <iconset/>
   </property>
   <layout class="QVBoxLayout" >
    <item>
