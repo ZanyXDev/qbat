@@ -17,7 +17,7 @@ namespace qbat {
 	CBatteryIcon::CBatteryIcon(QString batteryName, Settings * settings, QMenu * contextMenu, QObject * parent) :
 		QSystemTrayIcon(parent),
 		m_BatteryName(batteryName),
-		m_Icon(32, 32),
+		m_Icon(28, 28),
 		m_Settings(settings)
 	{
 		m_Icon.fill(Qt::transparent);
@@ -73,18 +73,25 @@ namespace qbat {
 			newToolTip += tr("design capacity: %4mAh").arg(chargeFullDesign / 1000);
 		
 		setToolTip(newToolTip);
-		m_Icon.fill(Qt::transparent);
 		
+		m_Icon.fill(Qt::transparent);
 		QPainter painter(&m_Icon);
 		
 		if (chargeNow != chargeFull) {
 			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN]));
 			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_EMPTY]));
-			painter.drawRect(0, 5, 31, 26);
+			painter.drawRect(0, 4, 27, 23);
 			
 			painter.setPen(Qt::NoPen);
 			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_CHARGED]));
-			painter.drawRect(1, 6 + 25 - (int)(25.0 * chargeNow / chargeFull), 30, (int)(25.0 * chargeNow / chargeFull));
+			
+			int chargedPixels = (int)(26 * 21 * (float)chargeNow / (float)chargeFull);
+			
+			painter.drawRect(1, 1 + 26 - chargedPixels / 21, 26, chargedPixels / 21);
+			if (chargedPixels % 26) {
+				painter.setPen(QColor(m_Settings->colors[UI_COLOR_BRUSH_CHARGED]));
+				painter.drawLine(1, 26 - chargedPixels / 21, 1 + chargedPixels % 26, 26 - chargedPixels / 21);
+			}
 			
 			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN]));
 			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_POLE]));
@@ -92,15 +99,16 @@ namespace qbat {
 		else {
 			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN_FULL]));
 			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_FULL]));
-			painter.drawRect(0, 5, 31, 26);
+			painter.drawRect(0, 4, 27, 23);
 			
 			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_POLE_FULL]));
 		}
-		painter.drawRect(9, 0, 13, 5);
+		painter.drawRect(8, 0, 11, 4);
 		
 		painter.setBrush(Qt::NoBrush);
-		painter.font().setPixelSize(16);
-		painter.drawText(1, 12, 30, 16, Qt::AlignHCenter, QString::number((int)(100.0 * chargeNow / chargeFull)));
+		
+		((QFont&)painter.font()).setPixelSize(15);
+		painter.drawText(1, 10, 26, 15, Qt::AlignHCenter, QString::number((int)(100.0 * chargeNow / chargeFull)));
 		
 		setIcon(m_Icon);
 	}
