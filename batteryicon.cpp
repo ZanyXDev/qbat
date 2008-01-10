@@ -85,13 +85,13 @@ namespace qbat {
 			painter.setPen(Qt::NoPen);
 			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_CHARGED]));
 			
-			int chargedPixels = (int)(26 * 21 * (float)chargeNow / (float)chargeFull);
+			int chargedPixels = (int)(21 * (float)chargeNow / (float)chargeFull);
 			
-			painter.drawRect(1, 1 + 26 - chargedPixels / 21, 26, chargedPixels / 21);
-			if (chargedPixels % 26) {
-				painter.setPen(QColor(m_Settings->colors[UI_COLOR_BRUSH_CHARGED]));
-				painter.drawLine(1, 26 - chargedPixels / 21, 1 + chargedPixels % 26, 26 - chargedPixels / 21);
-			}
+			painter.drawRect(1, 1 + 26 - chargedPixels, 26, chargedPixels);
+// 			if (chargedPixels % 26) {
+// 				painter.setPen(QColor(m_Settings->colors[UI_COLOR_BRUSH_CHARGED]));
+// 				painter.drawLine(1, 26 - chargedPixels / 21, 1 + chargedPixels % 26, 26 - chargedPixels / 21);
+// 			}
 			
 			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN]));
 			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_POLE]));
