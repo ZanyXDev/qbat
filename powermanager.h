@@ -22,6 +22,7 @@ namespace qbat {
 		Q_OBJECT
 	private:
 		int m_Timer;
+		bool m_CriticalHandled;
 		QDir m_SysfsDir;
 		
 		Settings m_Settings;

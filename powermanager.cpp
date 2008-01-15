@@ -16,6 +16,7 @@ namespace qbat {
 	
 	CPowerManager::CPowerManager(QObject * parent) :
 		QObject(parent),
+		m_CriticalHandled(false),
 		m_SysfsDir(UI_PATH_SYSFS_DIR),
 		m_SettingsFile(UI_FILE_CONFIG, QSettings::IniFormat, this),
 		m_DefaultTrayIcon(QIcon(UI_ICON_QBAT), this)
@@ -210,13 +211,14 @@ namespace qbat {
 			if (acPlug)
 				m_DefaultTrayIcon.setToolTip("QBat - " + tr("AC adapter plugged in"));
 			else {
-				if ((m_Settings.handleCritical) && (relativeCapacity <= m_Settings.criticalCapacity)) {
+				if ((m_Settings.handleCritical) && (relativeCapacity <= m_Settings.criticalCapacity) && (!m_CriticalHandled)) {
 					if (m_Settings.executeCommand)
 						QProcess::startDetached(m_Settings.criticalCommand);
 					else
 						QMessageBox::warning(NULL, tr("QBat - critical battery capacity"),
 							tr("WARNING: The attached battery(s) reached the critical mark.\n\
 							Please make sure to save and shut down soon or provide another source of power."));
+					m_CriticalHandled = true;
 				}
 				m_DefaultTrayIcon.setToolTip("QBat - " + tr("AC adapter unplugged"));
 			}
