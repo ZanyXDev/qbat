@@ -19,6 +19,17 @@ namespace qbat {
 		QString m_BatteryName;
 		QPixmap m_Icon;
 		Settings * m_Settings;
+		
+		qint8 m_RelativeCharge;
+		
+		int m_ChargeFull;
+		int m_ChargeFullDesign;
+		int m_ChargeNow;
+		int m_CurrentNow;
+		int m_Status;
+		
+		void updateIcon();
+		void updateToolTip();
 	public:
 		CBatteryIcon(QString batteryName, Settings * settings, QMenu * contextMenu, QObject * parent = 0);
 		~CBatteryIcon();

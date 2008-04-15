@@ -30,20 +30,53 @@ namespace qbat {
 	CBatteryIcon::~CBatteryIcon() {
 	}
 	
-	void CBatteryIcon::updateData(int chargeFull, int chargeFullDesign, int chargeNow, int currentNow, int status) {
+	void CBatteryIcon::updateIcon() {
+		m_Icon.fill(Qt::transparent);
+		QPainter painter(&m_Icon);
+		
+		if (m_ChargeNow != m_ChargeFull) {
+			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN]));
+			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_EMPTY]));
+			painter.drawRect(0, 4, 27, 23);
+			
+			int chargedPixels = (int)(21 * m_RelativeCharge / 100.0);
+			
+			painter.fillRect(1, 1 + 26 - chargedPixels, 26, chargedPixels, QColor(m_Settings->colors[UI_COLOR_BRUSH_CHARGED]));
+			
+			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_POLE]));
+		}
+		else {
+			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN_FULL]));
+			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_FULL]));
+			painter.drawRect(0, 4, 27, 23);
+			
+			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_POLE_FULL]));
+		}
+		painter.drawRect(8, 0, 11, 4);
+		
+		painter.setBrush(Qt::NoBrush);
+		
+		((QFont&)painter.font()).setPixelSize(14);
+		((QFont&)painter.font()).setBold(true);
+		painter.drawText(1, 10, 26, 15, Qt::AlignHCenter, QString::number(m_RelativeCharge));
+		
+		setIcon(m_Icon);
+	}
+	
+	void CBatteryIcon::updateToolTip() {
 		QString newToolTip = tr("QBat - %1: %2%").arg(m_BatteryName) +'\n';
 		
-		if (chargeFull)
-			newToolTip = newToolTip.arg((int)(100.0 * chargeNow / chargeFull));
-		else
+		if (m_RelativeCharge == -1)
 			newToolTip = newToolTip.arg('-');
+		else
+			newToolTip = newToolTip.arg(m_RelativeCharge);
 		
-		switch (status) {
+		switch (m_Status) {
 		case UI_BATTERY_DISCHARGING:
 			newToolTip += tr("status: %1").arg(tr("dischaging"));
-			if (currentNow) {
+			if (m_CurrentNow) {
 				newToolTip += '\n';
-				qreal remainingTime  = (qreal)chargeNow / (qreal)currentNow;
+				qreal remainingTime  = (qreal)m_ChargeNow / m_CurrentNow;
 				int remainingHours   = (int)remainingTime;
 				int remainungMinutes = (int)(remainingTime * 60) % 60;
 				newToolTip += tr("remaining time: %1:%2").arg(remainingHours, 2, 10, QChar('0')).arg(remainungMinutes, 2, 10, QChar('0'));
@@ -61,51 +94,62 @@ namespace qbat {
 		}
 		newToolTip += '\n';
 		
-		if (status != UI_BATTERY_FULL)
-			newToolTip += tr("current rate: %1A").arg(qRound(currentNow / 100000.0) / 10.0) + '\n';
+		if (m_Status != UI_BATTERY_FULL)
+			newToolTip += tr("current rate: %1A").arg(qRound(m_CurrentNow / 100000.0) / 10.0) + '\n';
 		
-		newToolTip += tr("current capacity: %2mAh").arg(chargeNow / 1000) + '\n';
+		newToolTip += tr("current capacity: %2mAh").arg(m_ChargeNow / 1000) + '\n';
 		
-		if (chargeFull)
-			newToolTip += tr("last full capacity: %3mAh").arg(chargeFull / 1000) + '\n';
+		if (m_ChargeFull)
+			newToolTip += tr("last full capacity: %3mAh").arg(m_ChargeFull / 1000) + '\n';
 		
-		if (chargeFullDesign)
-			newToolTip += tr("design capacity: %4mAh").arg(chargeFullDesign / 1000);
+		if (m_ChargeFullDesign)
+			newToolTip += tr("design capacity: %4mAh").arg(m_ChargeFullDesign / 1000);
 		
 		setToolTip(newToolTip);
+	}
+	
+	void CBatteryIcon::updateData(int chargeFull, int chargeFullDesign, int chargeNow, int currentNow, int status) {
+		bool update = false;
+		if (chargeNow == m_ChargeNow)
+			update = true;
+		else
+			m_ChargeNow = chargeNow;
 		
-		m_Icon.fill(Qt::transparent);
-		QPainter painter(&m_Icon);
+		if (currentNow == m_CurrentNow)
+			update = true;
+		else
+			m_CurrentNow = currentNow;
 		
-		if (chargeNow != chargeFull) {
-			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN]));
-			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_EMPTY]));
-			painter.drawRect(0, 4, 27, 23);
-			
-			painter.setPen(Qt::NoPen);
-			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_CHARGED]));
-			
-			int chargedPixels = (int)(21 * (float)chargeNow / (float)chargeFull);
-			
-			painter.drawRect(1, 1 + 26 - chargedPixels, 26, chargedPixels);
-			
-			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN]));
-			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_POLE]));
+		if (status == m_Status)
+			update = true;
+		else
+			m_Status = status;
+		
+		if (chargeFull == m_ChargeFullDesign)
+			update = true;
+		else
+			m_ChargeFullDesign = chargeFull;
+		
+		if (chargeFullDesign == m_ChargeFullDesign)
+			update = true;
+		else
+			m_ChargeFullDesign = chargeFullDesign;
+		
+		if (!update)
+			return;
+		
+		qint8 newRelativeCharge = 0;
+		
+		if (m_ChargeFull)
+			newRelativeCharge = (qint8)(100.0 * m_ChargeNow / m_ChargeFull);
+		else
+			newRelativeCharge = -1;
+		
+		if (newRelativeCharge != m_RelativeCharge) {
+			m_RelativeCharge = newRelativeCharge;
+			updateIcon();
 		}
-		else {
-			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN_FULL]));
-			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_FULL]));
-			painter.drawRect(0, 4, 27, 23);
-			
-			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_POLE_FULL]));
-		}
-		painter.drawRect(8, 0, 11, 4);
 		
-		painter.setBrush(Qt::NoBrush);
-		
-		((QFont&)painter.font()).setPixelSize(15);
-		painter.drawText(1, 10, 26, 15, Qt::AlignHCenter, QString::number((int)(100.0 * chargeNow / chargeFull)));
-		
-		setIcon(m_Icon);
+		updateToolTip();
 	}
 }
