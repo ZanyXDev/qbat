@@ -1,3 +1,10 @@
+qbat (0.1.4) unstable; urgency=low
+
+  * Fixed and improved battery icon painting
+  * Added caching of information
+
+ -- Oliver Groß <neokensuke@freenet.de>  Thu, 17 Apr 2008 14:13:30 +0200
+
 qbat (0.1.3) unstable; urgency=low
 
   * Small fixes
