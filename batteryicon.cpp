@@ -39,9 +39,9 @@ namespace qbat {
 			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_EMPTY]));
 			painter.drawRect(0, 4, 27, 23);
 			
-			int chargedPixels = (int)(21 * m_RelativeCharge / 100.0);
+			int chargedPixels = (int)(22 * m_RelativeCharge / 100.0);
 			
-			painter.fillRect(1, 1 + 26 - chargedPixels, 26, chargedPixels, QColor(m_Settings->colors[UI_COLOR_BRUSH_CHARGED]));
+			painter.fillRect(1, 5 + 22 - chargedPixels, 26, chargedPixels, QColor(m_Settings->colors[UI_COLOR_BRUSH_CHARGED]));
 			
 			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_POLE]));
 		}
@@ -52,13 +52,18 @@ namespace qbat {
 			
 			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_POLE_FULL]));
 		}
-		painter.drawRect(8, 0, 11, 4);
+		painter.drawRect(7, 0, 13, 4);
 		
 		painter.setBrush(Qt::NoBrush);
 		
-		((QFont&)painter.font()).setPixelSize(14);
+		if (m_RelativeCharge < 100)
+			((QFont&)painter.font()).setPixelSize(15);
+		else
+			((QFont&)painter.font()).setPixelSize(12);
+		
+		painter.setRenderHint(QPainter::TextAntialiasing);
 		((QFont&)painter.font()).setBold(true);
-		painter.drawText(1, 10, 26, 15, Qt::AlignHCenter, QString::number(m_RelativeCharge));
+		painter.drawText(1, 9, 26, 16, Qt::AlignHCenter, QString::number(m_RelativeCharge));
 		
 		setIcon(m_Icon);
 	}
@@ -109,33 +114,33 @@ namespace qbat {
 	}
 	
 	void CBatteryIcon::updateData(int chargeFull, int chargeFullDesign, int chargeNow, int currentNow, int status) {
-		bool update = false;
-		if (chargeNow == m_ChargeNow)
-			update = true;
-		else
+		bool noupdate = true;
+		if (chargeNow != m_ChargeNow) {
+			noupdate = false;
 			m_ChargeNow = chargeNow;
+		}
 		
-		if (currentNow == m_CurrentNow)
-			update = true;
-		else
+		if (currentNow != m_CurrentNow) {
+			noupdate = false;
 			m_CurrentNow = currentNow;
+		}
 		
-		if (status == m_Status)
-			update = true;
-		else
+		if (status != m_Status) {
+			noupdate = false;
 			m_Status = status;
+		}
 		
-		if (chargeFull == m_ChargeFullDesign)
-			update = true;
-		else
-			m_ChargeFullDesign = chargeFull;
+		if (chargeFull != m_ChargeFullDesign) {
+			noupdate = false;
+			m_ChargeFull = chargeFull;
+		}
 		
-		if (chargeFullDesign == m_ChargeFullDesign)
-			update = true;
-		else
+		if (chargeFullDesign != m_ChargeFullDesign) {
+			noupdate = false;
 			m_ChargeFullDesign = chargeFullDesign;
+		}
 		
-		if (!update)
+		if (noupdate)
 			return;
 		
 		qint8 newRelativeCharge = 0;
@@ -149,7 +154,6 @@ namespace qbat {
 			m_RelativeCharge = newRelativeCharge;
 			updateIcon();
 		}
-		
 		updateToolTip();
 	}
 }
