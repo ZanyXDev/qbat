@@ -1,6 +1,6 @@
 
 TEMPLATE = app
-CONFIG += qt qdbus
+CONFIG += qt
 
 CODECFORSRC = UTF-8
 CODECFORTR = ISO-8859-1
