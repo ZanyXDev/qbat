@@ -1,3 +1,13 @@
+qbat (0.1.5) unstable; urgency=low
+
+  * added option to display balloon tips instead of dialog messages
+  * added charging time information
+  * removed obsolete d-bus dependecy
+  * fixed .desktop file
+  * some Qt 4.4.x fixes
+
+ -- Oliver Groß <neokensuke@freenet.de>  Mon, 02 Jun 2008 15:52:59 +0200
+
 qbat (0.1.4) unstable; urgency=low
 
   * Fixed and improved battery icon painting
