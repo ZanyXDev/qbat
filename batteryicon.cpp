@@ -89,6 +89,13 @@ namespace qbat {
 			break;
 		case UI_BATTERY_CHARGING:
 			newToolTip += tr("status: %1").arg(tr("charging"));
+			if (m_CurrentNow && m_ChargeFull) {
+				newToolTip += '\n';
+				qreal remainingTime  = (qreal)(m_ChargeFull - m_ChargeNow) / m_CurrentNow;
+				int remainingHours   = (int)remainingTime;
+				int remainungMinutes = (int)(remainingTime * 60) % 60;
+				newToolTip += tr("remaining time: %1:%2").arg(remainingHours, 2, 10, QChar('0')).arg(remainungMinutes, 2, 10, QChar('0'));
+			}
 			break;
 		case UI_BATTERY_FULL:
 			newToolTip += tr("status: %1").arg(tr("full"));
