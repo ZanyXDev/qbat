@@ -21,6 +21,7 @@ namespace qbat {
 		bool executeCommand;
 		QString criticalCommand;
 		QRgb colors[UI_COUNT_COLORS];
+		bool showBalloon;
 /*		QRgb textColor;
 		QRgb mainEmptyColor;
 		QRgb mainChargedColor;

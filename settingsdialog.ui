@@ -6,14 +6,15 @@
     <x>0</x>
     <y>0</y>
     <width>455</width>
-    <height>410</height>
+    <height>444</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>QBat - Settings</string>
   </property>
   <property name="windowIcon" >
-   <iconset/>
+   <iconset>
+    <normaloff>../../../../usr/share/qbat/icons/qbat.png</normaloff>../../../../usr/share/qbat/icons/qbat.png</iconset>
   </property>
   <layout class="QVBoxLayout" >
    <item>
@@ -30,6 +31,12 @@
      <layout class="QGridLayout" >
       <item row="0" column="0" >
        <widget class="QLabel" name="criticalCapacitylabel" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text" >
          <string>Critical capacity (in %)</string>
         </property>
@@ -37,6 +44,12 @@
       </item>
       <item row="0" column="1" colspan="3" >
        <widget class="QSpinBox" name="criticalCapacitySpin" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimum" >
          <number>1</number>
         </property>
@@ -169,7 +182,7 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="4" >
+      <item row="3" column="0" colspan="5" >
        <widget class="QCheckBox" name="mergeBatteryCheck" >
         <property name="text" >
          <string>Merge battery icons to one virtual battery</string>
@@ -181,7 +194,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>40</width>
           <height>20</height>
@@ -193,9 +206,22 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="showBalloonCheck" >
+     <property name="text" >
+      <string>Show messages as balloon tips</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" >
      <item>
       <widget class="QLabel" name="pollingRateLabel" >
+       <property name="sizePolicy" >
+        <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text" >
         <string>Polling rate (in milliseconds)</string>
        </property>
@@ -203,6 +229,12 @@
      </item>
      <item>
       <widget class="QSpinBox" name="pollingRateSpin" >
+       <property name="sizePolicy" >
+        <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimum" >
         <number>100</number>
        </property>
@@ -221,7 +253,7 @@
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>437</width>
        <height>20</height>
@@ -235,7 +267,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons" >
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
      <property name="centerButtons" >
       <bool>false</bool>

@@ -31,6 +31,7 @@ namespace qbat {
 		m_Settings->executeCommand = ui.criticalCommandRadio->isChecked();
 		m_Settings->mergeBatterys = ui.mergeBatteryCheck->isChecked();
 		m_Settings->pollingRate = ui.pollingRateSpin->value();
+		m_Settings->showBalloon = ui.showBalloonCheck->isChecked();
 		
 		for (int i = 0; i < UI_COUNT_COLORS; i++)
 			m_Settings->colors[i] = colors[i];
@@ -44,6 +45,7 @@ namespace qbat {
 		ui.criticalCommandRadio->setChecked(settings->executeCommand);
 		ui.mergeBatteryCheck->setChecked(settings->mergeBatterys);
 		ui.pollingRateSpin->setValue(settings->pollingRate);
+		ui.showBalloonCheck->setChecked(settings->showBalloon);
 		
 		{
 			QPixmap colorIcon(24, 24);

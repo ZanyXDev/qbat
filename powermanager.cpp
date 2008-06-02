@@ -43,6 +43,7 @@ namespace qbat {
 	inline void CPowerManager::readSettings() {
 		m_SettingsFile.beginGroup("Main");
 		m_Settings.pollingRate = m_SettingsFile.value("pollingRate", 3000).toUInt();
+		m_Settings.showBalloon = m_SettingsFile.value("showBalloon", false).toBool();
 		m_SettingsFile.endGroup();
 		
 		m_SettingsFile.beginGroup("TrayIcons");
@@ -67,6 +68,7 @@ namespace qbat {
 	inline void CPowerManager::writeSettings() {
 		m_SettingsFile.beginGroup("Main");
 		m_SettingsFile.setValue("pollingRate", m_Settings.pollingRate);
+		m_SettingsFile.setValue("showBalloon", m_Settings.showBalloon);
 		m_SettingsFile.endGroup();
 		
 		m_SettingsFile.beginGroup("TrayIcons");
@@ -214,10 +216,16 @@ namespace qbat {
 				if ((m_Settings.handleCritical) && (relativeCapacity <= m_Settings.criticalCapacity) && (!m_CriticalHandled)) {
 					if (m_Settings.executeCommand)
 						QProcess::startDetached(m_Settings.criticalCommand);
-					else
-						QMessageBox::warning(NULL, tr("QBat - critical battery capacity"),
-							tr("WARNING: The attached battery(s) reached the critical mark.\n\
-							Please make sure to save and shut down soon or provide another source of power."));
+					else {
+						if (m_Settings.showBalloon) {
+							m_BatteryIcons.begin().value()->showMessage(tr("QBat - critical battery capacity"),
+								tr("WARNING: The attached battery(s) reached the critical mark.\n Please make sure to save and shut down soon or provide another source of power."),
+								QSystemTrayIcon::Warning, 7000);
+						}
+						else
+							QMessageBox::warning(NULL, tr("QBat - critical battery capacity"),
+								tr("WARNING: The attached battery(s) reached the critical mark.\n Please make sure to save and shut down soon or provide another source of power."));
+					}
 					m_CriticalHandled = true;
 				}
 				m_DefaultTrayIcon.setToolTip("QBat - " + tr("AC adapter unplugged"));
@@ -243,14 +251,24 @@ namespace qbat {
 	}
 	
 	void CPowerManager::showAbout() {
-		QMessageBox aboutBox;
-		
-		aboutBox.setWindowIcon(QIcon(UI_ICON_QBAT));
-		aboutBox.setIconPixmap(QPixmap(UI_ICON_QBAT));
-		aboutBox.setWindowTitle(tr("About QBat"));
-		aboutBox.setText(UI_NAME + "\nv" + QString(UI_VERSION));
-		aboutBox.setStandardButtons(QMessageBox::Ok);
-		
-		aboutBox.exec();
+		if (m_Settings.showBalloon) {
+			if (m_DefaultTrayIcon.isVisible())
+				m_DefaultTrayIcon.showMessage(tr("About QBat"), UI_NAME + "\nv" + QString(UI_VERSION),
+					QSystemTrayIcon::Information, 4000);
+			else
+				m_BatteryIcons.begin().value()->showMessage(tr("About QBat"), UI_NAME + "\nv" + QString(UI_VERSION),
+					QSystemTrayIcon::Information, 4000);
+		}
+		else {
+			QMessageBox aboutBox;
+			
+			aboutBox.setWindowIcon(QIcon(UI_ICON_QBAT));
+			aboutBox.setIconPixmap(QPixmap(UI_ICON_QBAT));
+			aboutBox.setWindowTitle(tr("About QBat"));
+			aboutBox.setText(UI_NAME + "\nv" + QString(UI_VERSION));
+			aboutBox.setStandardButtons(QMessageBox::Ok);
+			
+			aboutBox.exec();
+		}
 	}
 }
