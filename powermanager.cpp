@@ -117,9 +117,9 @@ namespace qbat {
 							acPlug = true;
 					}
 					else if (buffer == "Battery") {
-						chargeFull       += readIntSysFile(m_SysfsDir.filePath(i + "/charge_full").toAscii().constData());
-						chargeFullDesign += readIntSysFile(m_SysfsDir.filePath(i + "/charge_full_design").toAscii().constData());
-						chargeNow        += readIntSysFile(m_SysfsDir.filePath(i + "/charge_now").toAscii().constData());
+						chargeFull       += readIntSysFile(m_SysfsDir.filePath(i + "/energy_full").toAscii().constData());
+						chargeFullDesign += readIntSysFile(m_SysfsDir.filePath(i + "/energy_full_design").toAscii().constData());
+						chargeNow        += readIntSysFile(m_SysfsDir.filePath(i + "/energy_now").toAscii().constData());
 						currentNow       += readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData());
 						
 						int statusBuffer = toStatusInt(readStringSysFile(m_SysfsDir.filePath(i + "/status").toAscii().constData()));
