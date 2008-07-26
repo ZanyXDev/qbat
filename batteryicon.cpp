@@ -18,7 +18,8 @@ namespace qbat {
 		QSystemTrayIcon(parent),
 		m_BatteryName(batteryName),
 		m_Icon(28, 28),
-		m_Settings(settings)
+		m_Settings(settings),
+		m_energyUnits(false)
 	{
 		m_Icon.fill(Qt::transparent);
 		setIcon(m_Icon);
@@ -106,22 +107,38 @@ namespace qbat {
 		}
 		newToolTip += '\n';
 		
-		if (m_Status != UI_BATTERY_FULL)
-			newToolTip += tr("current rate: %1A").arg(qRound(m_CurrentNow / 100000.0) / 10.0) + '\n';
-		
-		newToolTip += tr("current capacity: %2mAh").arg(m_ChargeNow / 1000) + '\n';
-		
-		if (m_ChargeFull)
-			newToolTip += tr("last full capacity: %3mAh").arg(m_ChargeFull / 1000) + '\n';
-		
-		if (m_ChargeFullDesign)
-			newToolTip += tr("design capacity: %4mAh").arg(m_ChargeFullDesign / 1000);
-		
+		if (m_energyUnits) {
+			if (m_Status != UI_BATTERY_FULL)
+				newToolTip += tr("current rate: %1W").arg(qRound(m_CurrentNow / 100000.0) / 10.0) + '\n';
+			
+			newToolTip += tr("current capacity: %2mWh").arg(m_ChargeNow / 1000) + '\n';
+			
+			if (m_ChargeFull)
+				newToolTip += tr("last full capacity: %3mWh").arg(m_ChargeFull / 1000) + '\n';
+			
+			if (m_ChargeFullDesign)
+				newToolTip += tr("design capacity: %4mWh").arg(m_ChargeFullDesign / 1000);
+		}
+		else
+		{
+			if (m_Status != UI_BATTERY_FULL)
+				newToolTip += tr("current rate: %1A").arg(qRound(m_CurrentNow / 100000.0) / 10.0) + '\n';
+			
+			newToolTip += tr("current capacity: %2mAh").arg(m_ChargeNow / 1000) + '\n';
+			
+			if (m_ChargeFull)
+				newToolTip += tr("last full capacity: %3mAh").arg(m_ChargeFull / 1000) + '\n';
+			
+			if (m_ChargeFullDesign)
+				newToolTip += tr("design capacity: %4mAh").arg(m_ChargeFullDesign / 1000);
+		}
 		setToolTip(newToolTip);
 	}
 	
-	void CBatteryIcon::updateData(int chargeFull, int chargeFullDesign, int chargeNow, int currentNow, int status) {
+	void CBatteryIcon::updateData(int chargeFull, int chargeFullDesign, int chargeNow, int currentNow, int status, bool energyUnits) {
 		bool noupdate = true;
+		m_energyUnits = energyUnits;
+		
 		if (chargeNow != m_ChargeNow) {
 			noupdate = false;
 			m_ChargeNow = chargeNow;

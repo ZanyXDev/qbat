@@ -11,7 +11,7 @@
 #include <QSystemTrayIcon>
 
 namespace qbat {
-	class Settings;
+	struct Settings;
 	
 	class CBatteryIcon : public QSystemTrayIcon {
 		Q_OBJECT
@@ -28,6 +28,8 @@ namespace qbat {
 		int m_CurrentNow;
 		int m_Status;
 		
+		bool m_energyUnits;
+		
 		void updateIcon();
 		void updateToolTip();
 	public:
@@ -36,7 +38,7 @@ namespace qbat {
 		
 		QString batteryName() const { return m_BatteryName; }
 		
-		void updateData(int chargeFull, int chargeFullDesign, int chargeNow, int currentNow, int status);
+		void updateData(int chargeFull, int chargeFullDesign, int chargeNow, int currentNow, int status, bool energyUnits);
 	};
 }
 

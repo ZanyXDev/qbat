@@ -12,6 +12,12 @@
 #define UI_PATH_WORK                    (QDir::toNativeSeparators(QDir::homePath()) + "/" UI_DIR_WORK)
 
 #define UI_FILE_CONFIG                  (UI_PATH_WORK + "qbat.conf")
+#define UI_CAPTION_ENERGY               "energy"
+#define UI_CAPTION_CURRENT              "current"
+#define UI_CAPTION_VOLTAGE              "voltage"
+#define UI_CAPTION_NOW(a)               "/" + a + "_now"
+#define UI_CAPTION_FULL(a)              "/" + a + "_full"
+#define UI_CAPTION_DESIGN(a)            UI_CAPTION_FULL(a) + "_design"
 
 #define UI_ICON_QBAT                    UI_PATH_ICONS "qbat.svg"
 

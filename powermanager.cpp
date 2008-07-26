@@ -105,6 +105,8 @@ namespace qbat {
 			int currentNow = 0;
 			int status = 0;
 			
+			bool energyUnits = false;
+			
 			int relativeCapacity = 100;
 			
 			if (m_Settings.mergeBatterys) {
@@ -117,10 +119,21 @@ namespace qbat {
 							acPlug = true;
 					}
 					else if (buffer == "Battery") {
-						chargeFull       += readIntSysFile(m_SysfsDir.filePath(i + "/energy_full").toAscii().constData());
-						chargeFullDesign += readIntSysFile(m_SysfsDir.filePath(i + "/energy_full_design").toAscii().constData());
-						chargeNow        += readIntSysFile(m_SysfsDir.filePath(i + "/energy_now").toAscii().constData());
-						currentNow       += readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData());
+						energyUnits = m_SysfsDir.exists(i + UI_CAPTION_NOW(UI_CAPTION_ENERGY));
+						
+						if (energyUnits) {
+							double voltage = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_VOLTAGE)).toAscii().constData()) / 1000000.0;
+							
+							chargeFull       += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_FULL(UI_CAPTION_ENERGY)).toAscii().constData()) / voltage);
+							chargeFullDesign += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_DESIGN(UI_CAPTION_ENERGY)).toAscii().constData()) / voltage);
+							chargeNow        += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_ENERGY)).toAscii().constData()) / voltage);
+						}
+						else {
+							chargeFull       += readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_FULL(UI_CAPTION_CURRENT)).toAscii().constData());
+							chargeFullDesign += readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_DESIGN(UI_CAPTION_CURRENT)).toAscii().constData());
+							chargeNow        += readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_CURRENT)).toAscii().constData());
+						}
+						currentNow += readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData());
 						
 						int statusBuffer = toStatusInt(readStringSysFile(m_SysfsDir.filePath(i + "/status").toAscii().constData()));
 						
@@ -150,11 +163,11 @@ namespace qbat {
 						}
 						
 						CBatteryIcon * currentBatteryIcon = new CBatteryIcon("average", &m_Settings, &m_ContextMenu, this);
-						currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, status);
+						currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, status, false);
 						m_BatteryIcons.insert("merged", currentBatteryIcon);
 					}
 					else
-						m_BatteryIcons["merged"]->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, status);
+						m_BatteryIcons["merged"]->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, status, false);
 				}
 				else {
 					delete m_BatteryIcons.take("merged");
@@ -175,9 +188,18 @@ namespace qbat {
 							acPlug = true;
 					}
 					else if (buffer == "Battery") {
-						chargeFull       = readIntSysFile(m_SysfsDir.filePath(i + "/charge_full").toAscii().constData());
-						chargeFullDesign = readIntSysFile(m_SysfsDir.filePath(i + "/charge_full_design").toAscii().constData());
-						chargeNow        = readIntSysFile(m_SysfsDir.filePath(i + "/charge_now").toAscii().constData());
+						energyUnits = m_SysfsDir.exists(i + UI_CAPTION_NOW(UI_CAPTION_ENERGY));
+						
+						if (energyUnits) {
+							chargeFull       = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_FULL(UI_CAPTION_ENERGY)).toAscii().constData());
+							chargeFullDesign = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_DESIGN(UI_CAPTION_ENERGY)).toAscii().constData());
+							chargeNow        = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_ENERGY)).toAscii().constData());
+						}
+						else {
+							chargeFull       = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_FULL(UI_CAPTION_CURRENT)).toAscii().constData());
+							chargeFullDesign = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_DESIGN(UI_CAPTION_CURRENT)).toAscii().constData());
+							chargeNow        = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_CURRENT)).toAscii().constData());
+						}
 						currentNow       = readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData());
 						status           = toStatusInt(readStringSysFile(m_SysfsDir.filePath(i + "/status").toAscii().constData()));
 						
@@ -186,11 +208,11 @@ namespace qbat {
 						
 						if (!m_BatteryIcons.contains(i)) {
 							currentBatteryIcon = new CBatteryIcon(i, &m_Settings, &m_ContextMenu, this);
-							currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, status);
+							currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, status, energyUnits);
 						}
 						else {
 							currentBatteryIcon = m_BatteryIcons.take(i);
-							currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, status);
+							currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, status, energyUnits);
 						}
 						newBatteryIcons << currentBatteryIcon;
 					}
