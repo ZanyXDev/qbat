@@ -127,13 +127,14 @@ namespace qbat {
 							chargeFull       += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_FULL(UI_CAPTION_ENERGY)).toAscii().constData()) / voltage);
 							chargeFullDesign += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_DESIGN(UI_CAPTION_ENERGY)).toAscii().constData()) / voltage);
 							chargeNow        += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_ENERGY)).toAscii().constData()) / voltage);
+							currentNow       += qRound(readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData()) / voltage);
 						}
 						else {
 							chargeFull       += readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_FULL(UI_CAPTION_CURRENT)).toAscii().constData());
 							chargeFullDesign += readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_DESIGN(UI_CAPTION_CURRENT)).toAscii().constData());
 							chargeNow        += readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_CURRENT)).toAscii().constData());
+							currentNow       += readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData());
 						}
-						currentNow += readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData());
 						
 						int statusBuffer = toStatusInt(readStringSysFile(m_SysfsDir.filePath(i + "/status").toAscii().constData()));
 						
