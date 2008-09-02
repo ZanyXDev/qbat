@@ -1,7 +1,7 @@
 #ifndef QBAT_CONSTANTS_H
 #define QBAT_CONSTANTS_H
 
-#define UI_VERSION                      "0.1.6"
+#define UI_VERSION                      "0.1.7"
 #define UI_NAME                         tr("QBat - Qt Battery Monitor")
 
 #define UI_DIR_WORK                     ".qbat/"
@@ -13,7 +13,7 @@
 
 #define UI_FILE_CONFIG                  (UI_PATH_WORK + "qbat.conf")
 #define UI_CAPTION_ENERGY               "energy"
-#define UI_CAPTION_CURRENT              "current"
+#define UI_CAPTION_CHARGE               "charge"
 #define UI_CAPTION_VOLTAGE              "voltage"
 #define UI_CAPTION_NOW(a)               "/" + a + "_now"
 #define UI_CAPTION_FULL(a)              "/" + a + "_full"

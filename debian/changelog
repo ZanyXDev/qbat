@@ -1,3 +1,11 @@
+qbat (0.1.7) unstable; urgency=low
+
+  * fixed "command<->waring" setting
+  * fixed sysfs filenames
+  * fixed lintian copyright warning
+
+ -- Oliver Groß <neokensuke@freenet.de>  Tue, 02 Sep 2008 22:11:25 +0200
+
 qbat (0.1.6) unstable; urgency=low
 
   * added basic support for battery stats in mWh

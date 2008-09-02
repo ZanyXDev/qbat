@@ -27,15 +27,18 @@ namespace qbat {
 	void CSettings::applySettings() {
 		m_Settings->handleCritical = ui.criticalGroup->isChecked();
 		m_Settings->criticalCapacity = ui.criticalCapacitySpin->value();
+		
 		m_Settings->executeCommand = ui.criticalCommandRadio->isChecked();
 		m_Settings->criticalCommand = ui.criticalCommandEdit->text();
-		m_Settings->mergeBatterys = ui.mergeBatteryCheck->isChecked();
+		
 		m_Settings->confirmCommand = ui.confirmCommandBox->isChecked();
 		m_Settings->confirmWithTimeout = ui.timeoutCheck->isChecked();
 		m_Settings->timeoutValue = ui.timeoutSpin->value();
 		
 		for (int i = 0; i < UI_COUNT_COLORS; i++)
 			m_Settings->colors[i] = colors[i];
+		
+		m_Settings->mergeBatterys = ui.mergeBatteryCheck->isChecked();
 		
 		m_Settings->showBalloon = ui.showBalloonCheck->isChecked();
 		m_Settings->pollingRate = ui.pollingRateSpin->value();
@@ -44,13 +47,15 @@ namespace qbat {
 	}
 	
 	bool CSettings::execute(Settings * settings) {
-		m_Settings = settings;
-		
 		ui.criticalGroup->setChecked(settings->handleCritical);
 		ui.criticalCapacitySpin->setValue(settings->criticalCapacity);
-		ui.criticalCommandRadio->setChecked(settings->executeCommand);
+		
+		if (settings->executeCommand)
+			ui.criticalCommandRadio->setChecked(true);
+		else
+			ui.criticalWarningRadio->setChecked(true);
+		
 		ui.criticalCommandEdit->setText(settings->criticalCommand);
-		ui.mergeBatteryCheck->setChecked(settings->mergeBatterys);
 		ui.confirmCommandBox->setChecked(settings->confirmCommand);
 		ui.timeoutCheck->setChecked(settings->confirmWithTimeout);
 		ui.timeoutSpin->setValue(settings->timeoutValue);
@@ -64,10 +69,12 @@ namespace qbat {
 				colors[i] = settings->colors[i];
 			}
 		}
+		ui.mergeBatteryCheck->setChecked(settings->mergeBatterys);
 		
 		ui.pollingRateSpin->setValue(settings->pollingRate);
 		ui.showBalloonCheck->setChecked(settings->showBalloon);
 		
+		m_Settings = settings;
 		
 		if (exec()) {
 			applySettings();
