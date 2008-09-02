@@ -18,7 +18,8 @@ SOURCES += main.cpp \
  batteryicon.cpp \
  powermanager.cpp \
  common.cpp \
- settings.cpp
+ settings.cpp \
+ qtimermessagebox.cpp
 DESTDIR = .
 
 target.path = /usr/bin
@@ -35,7 +36,8 @@ HEADERS += constants.h \
 batteryicon.h \
 common.h \
 powermanager.h \
- settings.h
+ settings.h \
+ qtimermessagebox.h
 TARGET = qbat
 
 FORMS += settingsdialog.ui
