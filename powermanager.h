@@ -21,6 +21,8 @@ namespace qbat {
 	class CPowerManager : public QObject {
 		Q_OBJECT
 	private:
+		enum messageType {MSGT_INFORMATION, MSGT_WARNING};
+		
 		int m_Timer;
 		bool m_CriticalHandled;
 		QDir m_SysfsDir;
@@ -33,10 +35,10 @@ namespace qbat {
 		QHash<QString, CBatteryIcon *> m_BatteryIcons;
 		QSystemTrayIcon m_DefaultTrayIcon;
 		
-		void timerEvent(QTimerEvent * event);
-		
 		inline void readSettings();
 		inline void writeSettings();
+		
+		void timerEvent(QTimerEvent * event);
 	public:
 		CPowerManager(QObject * parent = 0);
 		~CPowerManager();

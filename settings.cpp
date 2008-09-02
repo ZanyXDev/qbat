@@ -22,30 +22,38 @@ namespace qbat {
 		connect(&colorSelectButtons, SIGNAL(buttonClicked(int)), this, SLOT(editColor(int)));
 	}
 	
-	CSettings::~CSettings() {
-	}
+	CSettings::~CSettings() {}
 	
 	void CSettings::applySettings() {
 		m_Settings->handleCritical = ui.criticalGroup->isChecked();
 		m_Settings->criticalCapacity = ui.criticalCapacitySpin->value();
 		m_Settings->executeCommand = ui.criticalCommandRadio->isChecked();
+		m_Settings->criticalCommand = ui.criticalCommandEdit->text();
 		m_Settings->mergeBatterys = ui.mergeBatteryCheck->isChecked();
-		m_Settings->pollingRate = ui.pollingRateSpin->value();
-		m_Settings->showBalloon = ui.showBalloonCheck->isChecked();
+		m_Settings->confirmCommand = ui.confirmCommandBox->isChecked();
+		m_Settings->confirmWithTimeout = ui.timeoutCheck->isChecked();
+		m_Settings->timeoutValue = ui.timeoutSpin->value();
 		
 		for (int i = 0; i < UI_COUNT_COLORS; i++)
 			m_Settings->colors[i] = colors[i];
+		
+		m_Settings->showBalloon = ui.showBalloonCheck->isChecked();
+		m_Settings->pollingRate = ui.pollingRateSpin->value();
 		
 		emit settingsChanged();
 	}
 	
 	bool CSettings::execute(Settings * settings) {
+		m_Settings = settings;
+		
 		ui.criticalGroup->setChecked(settings->handleCritical);
 		ui.criticalCapacitySpin->setValue(settings->criticalCapacity);
 		ui.criticalCommandRadio->setChecked(settings->executeCommand);
+		ui.criticalCommandEdit->setText(settings->criticalCommand);
 		ui.mergeBatteryCheck->setChecked(settings->mergeBatterys);
-		ui.pollingRateSpin->setValue(settings->pollingRate);
-		ui.showBalloonCheck->setChecked(settings->showBalloon);
+		ui.confirmCommandBox->setChecked(settings->confirmCommand);
+		ui.timeoutCheck->setChecked(settings->confirmWithTimeout);
+		ui.timeoutSpin->setValue(settings->timeoutValue);
 		
 		{
 			QPixmap colorIcon(24, 24);
@@ -57,7 +65,9 @@ namespace qbat {
 			}
 		}
 		
-		m_Settings = settings;
+		ui.pollingRateSpin->setValue(settings->pollingRate);
+		ui.showBalloonCheck->setChecked(settings->showBalloon);
+		
 		
 		if (exec()) {
 			applySettings();

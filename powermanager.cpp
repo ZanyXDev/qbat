@@ -10,6 +10,7 @@
 #include "common.h"
 #include "settings.h"
 #include "batteryicon.h"
+#include "qtimermessagebox.h"
 
 namespace qbat {
 	using namespace std;
@@ -62,6 +63,9 @@ namespace qbat {
 		m_Settings.criticalCapacity = m_SettingsFile.value("criticalCapacity", 7).toUInt();
 		m_Settings.executeCommand = m_SettingsFile.value("executeCommand", false).toBool();
 		m_Settings.criticalCommand = m_SettingsFile.value("command", "").toString();
+		m_Settings.confirmCommand = m_SettingsFile.value("confirmCommand", false).toBool();
+		m_Settings.confirmWithTimeout = m_SettingsFile.value("confirmWithTimeout", false).toBool();
+		m_Settings.timeoutValue = m_SettingsFile.value("timeoutValue", 5).toUInt();
 		m_SettingsFile.endGroup();
 	}
 	
@@ -87,6 +91,9 @@ namespace qbat {
 		m_SettingsFile.setValue("criticalCapacity", m_Settings.criticalCapacity);
 		m_SettingsFile.setValue("executeCommand", m_Settings.executeCommand);
 		m_SettingsFile.setValue("command", m_Settings.criticalCommand);
+		m_SettingsFile.setValue("confirmCommand", m_Settings.confirmCommand);
+		m_SettingsFile.setValue("confirmWithTimeout", m_Settings.confirmWithTimeout);
+		m_SettingsFile.setValue("timeoutValue", m_Settings.timeoutValue);
 		m_SettingsFile.endGroup();
 	}
 	
@@ -236,20 +243,26 @@ namespace qbat {
 			if (acPlug)
 				m_DefaultTrayIcon.setToolTip("QBat - " + tr("AC adapter plugged in"));
 			else {
-				if ((m_Settings.handleCritical) && (relativeCapacity <= m_Settings.criticalCapacity) && (!m_CriticalHandled)) {
-					if (m_Settings.executeCommand)
-						QProcess::startDetached(m_Settings.criticalCommand);
-					else {
-						if (m_Settings.showBalloon) {
-							m_BatteryIcons.begin().value()->showMessage(tr("QBat - critical battery capacity"),
-								tr("WARNING: The attached battery(s) reached the critical mark.\n Please make sure to save and shut down soon or provide another source of power."),
-								QSystemTrayIcon::Warning, 7000);
+				if (m_Settings.handleCritical) {
+					if ((relativeCapacity <= m_Settings.criticalCapacity) && (!m_CriticalHandled)) {
+						QString msgTitle = (m_Settings.executeCommand && m_Settings.confirmWithTimeout) ?
+							tr("QBat - critical battery capacity (will automatically choose ok on timeout)"):
+							tr("QBat - critical battery capacity");
+						QString msgText = (m_Settings.executeCommand && m_Settings.confirmCommand) ?
+							tr("WARNING: The attached battery(s) reached the critical mark.\nClick cancel and please make sure to save and shut down soon or provide another source of power\nor:\nClick ok to execute:\n%1").arg(m_Settings.criticalCommand) :
+							tr("WARNING: The attached battery(s) reached the critical mark.\nPlease make sure to save and shut down soon or provide another source of power.");
+						if (m_Settings.executeCommand && (!m_Settings.confirmCommand || ((m_Settings.confirmWithTimeout) ? QTimerMessageBox::warning(NULL, msgTitle, msgText, m_Settings.timeoutValue, QMessageBox::Ok | QMessageBox::Cancel) : QMessageBox::warning(NULL, msgTitle, msgText, QMessageBox::Ok | QMessageBox::Cancel))))
+							QProcess::startDetached(m_Settings.criticalCommand);
+						else {
+							if (m_Settings.showBalloon)
+								m_BatteryIcons.begin().value()->showMessage(msgTitle, msgText, QSystemTrayIcon::Warning, 7000);
+							else
+								QMessageBox::warning(NULL, msgTitle, msgText);
 						}
-						else
-							QMessageBox::warning(NULL, tr("QBat - critical battery capacity"),
-								tr("WARNING: The attached battery(s) reached the critical mark.\n Please make sure to save and shut down soon or provide another source of power."));
+						m_CriticalHandled = true;
 					}
-					m_CriticalHandled = true;
+					else
+						m_CriticalHandled = false;
 				}
 				m_DefaultTrayIcon.setToolTip("QBat - " + tr("AC adapter unplugged"));
 			}

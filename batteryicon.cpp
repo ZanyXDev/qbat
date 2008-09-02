@@ -111,26 +111,26 @@ namespace qbat {
 			if (m_Status != UI_BATTERY_FULL)
 				newToolTip += tr("current rate: %1W").arg(qRound(m_CurrentNow / 100000.0) / 10.0) + '\n';
 			
-			newToolTip += tr("current capacity: %2mWh").arg(m_ChargeNow / 1000) + '\n';
+			newToolTip += tr("current capacity: %2mWh").arg(m_ChargeNow / 1000);
 			
 			if (m_ChargeFull)
-				newToolTip += tr("last full capacity: %3mWh").arg(m_ChargeFull / 1000) + '\n';
+				newToolTip += '\n' + tr("last full capacity: %3mWh").arg(m_ChargeFull / 1000);
 			
 			if (m_ChargeFullDesign)
-				newToolTip += tr("design capacity: %4mWh").arg(m_ChargeFullDesign / 1000);
+				newToolTip += '\n' + tr("design capacity: %4mWh").arg(m_ChargeFullDesign / 1000);
 		}
 		else
 		{
 			if (m_Status != UI_BATTERY_FULL)
 				newToolTip += tr("current rate: %1A").arg(qRound(m_CurrentNow / 100000.0) / 10.0) + '\n';
 			
-			newToolTip += tr("current capacity: %2mAh").arg(m_ChargeNow / 1000) + '\n';
+			newToolTip += tr("current capacity: %2mAh").arg(m_ChargeNow / 1000);
 			
 			if (m_ChargeFull)
-				newToolTip += tr("last full capacity: %3mAh").arg(m_ChargeFull / 1000) + '\n';
+				newToolTip += '\n' + tr("last full capacity: %3mAh").arg(m_ChargeFull / 1000);
 			
 			if (m_ChargeFullDesign)
-				newToolTip += tr("design capacity: %4mAh").arg(m_ChargeFullDesign / 1000);
+				newToolTip += '\n' + tr("design capacity: %4mAh").arg(m_ChargeFullDesign / 1000);
 		}
 		setToolTip(newToolTip);
 	}

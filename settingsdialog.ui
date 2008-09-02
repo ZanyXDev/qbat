@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>455</width>
-    <height>444</height>
+    <width>445</width>
+    <height>495</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -25,9 +25,6 @@
      <property name="checkable" >
       <bool>true</bool>
      </property>
-     <property name="checked" >
-      <bool>false</bool>
-     </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" >
        <widget class="QLabel" name="criticalCapacitylabel" >
@@ -42,29 +39,13 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="3" >
-       <widget class="QSpinBox" name="criticalCapacitySpin" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimum" >
-         <number>1</number>
-        </property>
-        <property name="maximum" >
-         <number>99</number>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0" >
        <widget class="QRadioButton" name="criticalWarningRadio" >
         <property name="text" >
          <string>Show warning message</string>
         </property>
         <property name="checked" >
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -73,14 +54,91 @@
         <property name="text" >
          <string>Execute command</string>
         </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QSpinBox" name="criticalCapacitySpin" >
+        <property name="minimum" >
+         <number>1</number>
+        </property>
+        <property name="maximum" >
+         <number>99</number>
+        </property>
+        <property name="value" >
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" colspan="2" >
+       <spacer name="horizontalSpacer_3" >
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="4" column="0" colspan="4" >
+       <widget class="QGroupBox" name="confirmCommandBox" >
+        <property name="title" >
+         <string>Confirm command</string>
+        </property>
+        <property name="checkable" >
+         <bool>true</bool>
+        </property>
+        <layout class="QGridLayout" name="gridLayout" >
+         <item row="0" column="0" >
+          <widget class="QCheckBox" name="timeoutCheck" >
+           <property name="text" >
+            <string>Use timeout to confirm</string>
+           </property>
+           <property name="checked" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" >
+          <widget class="QSpinBox" name="timeoutSpin" >
+           <property name="minimum" >
+            <number>1</number>
+           </property>
+           <property name="value" >
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2" >
+          <widget class="QLabel" name="timeoutLabel" >
+           <property name="text" >
+            <string>Seconds</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3" >
+          <spacer name="horizontalSpacer_4" >
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0" >
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </widget>
       </item>
       <item rowspan="2" row="2" column="1" colspan="3" >
-       <widget class="QLineEdit" name="criticalCommandEdit" >
-        <property name="enabled" >
-         <bool>false</bool>
-        </property>
-       </widget>
+       <widget class="QLineEdit" name="criticalCommandEdit" />
       </item>
      </layout>
     </widget>
@@ -91,7 +149,7 @@
       <string>Battery icon(s)</string>
      </property>
      <layout class="QGridLayout" >
-      <item row="0" column="0" >
+      <item row="0" column="0" colspan="2" >
        <widget class="QLabel" name="mainColorLabel" >
         <property name="text" >
          <string>Main color</string>
@@ -128,7 +186,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
+      <item row="1" column="0" colspan="2" >
        <widget class="QLabel" name="textColorLabel" >
         <property name="text" >
          <string>Text color</string>
@@ -155,7 +213,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0" >
+      <item row="2" column="0" colspan="2" >
        <widget class="QLabel" name="poleLabel" >
         <property name="text" >
          <string>"+ pole" color</string>
@@ -182,15 +240,15 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="5" >
+      <item row="3" column="0" colspan="6" >
        <widget class="QCheckBox" name="mergeBatteryCheck" >
         <property name="text" >
          <string>Merge battery icons to one virtual battery</string>
         </property>
        </widget>
       </item>
-      <item rowspan="3" row="0" column="1" >
-       <spacer>
+      <item rowspan="3" row="0" column="5" >
+       <spacer name="horizontalSpacer" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
@@ -203,6 +261,18 @@
        </spacer>
       </item>
      </layout>
+     <zorder>mainColorLabel</zorder>
+     <zorder>mainFullColorButton</zorder>
+     <zorder>mainChargedColorButton</zorder>
+     <zorder>mainEmptyColorButton</zorder>
+     <zorder>textColorLabel</zorder>
+     <zorder>textFullColorButton</zorder>
+     <zorder>textColorButton</zorder>
+     <zorder>poleLabel</zorder>
+     <zorder>poleFullColorButton</zorder>
+     <zorder>poleColorButton</zorder>
+     <zorder>mergeBatteryCheck</zorder>
+     <zorder>horizontalSpacer</zorder>
     </widget>
    </item>
    <item>
@@ -229,12 +299,6 @@
      </item>
      <item>
       <widget class="QSpinBox" name="pollingRateSpin" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
        <property name="minimum" >
         <number>100</number>
        </property>
@@ -246,10 +310,23 @@
        </property>
       </widget>
      </item>
+     <item>
+      <spacer name="horizontalSpacer_2" >
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0" >
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
    </item>
    <item>
-    <spacer>
+    <spacer name="verticalSpacer" >
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
@@ -278,10 +355,8 @@
  </widget>
  <tabstops>
   <tabstop>criticalGroup</tabstop>
-  <tabstop>criticalCapacitySpin</tabstop>
   <tabstop>criticalWarningRadio</tabstop>
   <tabstop>criticalCommandRadio</tabstop>
-  <tabstop>criticalCommandEdit</tabstop>
   <tabstop>mainFullColorButton</tabstop>
   <tabstop>mainChargedColorButton</tabstop>
   <tabstop>mainEmptyColorButton</tabstop>
@@ -302,8 +377,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>227</x>
-     <y>383</y>
+     <x>235</x>
+     <y>490</y>
     </hint>
     <hint type="destinationlabel" >
      <x>157</x>
@@ -318,8 +393,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>295</x>
-     <y>389</y>
+     <x>303</x>
+     <y>490</y>
     </hint>
     <hint type="destinationlabel" >
      <x>286</x>
@@ -340,6 +415,54 @@
     <hint type="destinationlabel" >
      <x>208</x>
      <y>112</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>timeoutCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>timeoutSpin</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>129</x>
+     <y>186</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>257</x>
+     <y>189</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>timeoutCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>timeoutLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>101</x>
+     <y>186</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>315</x>
+     <y>189</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>criticalCommandRadio</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>confirmCommandBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>67</x>
+     <y>109</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>180</x>
+     <y>141</y>
     </hint>
    </hints>
   </connection>

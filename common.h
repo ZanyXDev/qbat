@@ -20,6 +20,9 @@ namespace qbat {
 		quint8 criticalCapacity;
 		bool executeCommand;
 		QString criticalCommand;
+		bool confirmCommand;
+		bool confirmWithTimeout;
+		quint16 timeoutValue;
 		QRgb colors[UI_COUNT_COLORS];
 		bool showBalloon;
 /*		QRgb textColor;
