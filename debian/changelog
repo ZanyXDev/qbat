@@ -1,3 +1,13 @@
+qbat (0.1.6) unstable; urgency=low
+
+  * added basic support for battery stats in mWh
+  * added confirmation dialog before executing command
+    (with optional timeout)
+  * added gentoo ebuild
+  * fixed setting command
+
+ -- Oliver Groß <neokensuke@freenet.de>  Tue, 02 Sep 2008 20:21:16 +0200
+
 qbat (0.1.5) unstable; urgency=low
 
   * added option to display balloon tips instead of dialog messages
