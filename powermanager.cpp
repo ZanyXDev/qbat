@@ -221,6 +221,7 @@ namespace qbat {
 						else {
 							currentBatteryIcon = m_BatteryIcons.take(i);
 							currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, status, energyUnits);
+							m_CriticalHandled = false;
 						}
 						newBatteryIcons << currentBatteryIcon;
 					}
@@ -239,12 +240,13 @@ namespace qbat {
 					relativeCapacity = (int)(100.0 * chargeNowMid / chargeFullMid);
 			}
 			
-			
-			if (acPlug)
+			if (acPlug) {
 				m_DefaultTrayIcon.setToolTip("QBat - " + tr("AC adapter plugged in"));
+				m_CriticalHandled = false;
+			}
 			else {
 				if (m_Settings.handleCritical) {
-					if ((relativeCapacity <= m_Settings.criticalCapacity) && (!m_CriticalHandled)) {
+					if ((relativeCapacity >= m_Settings.criticalCapacity) && (!m_CriticalHandled)) {
 						QString msgTitle = (m_Settings.executeCommand && m_Settings.confirmWithTimeout) ?
 							tr("QBat - critical battery capacity (will automatically choose ok on timeout)"):
 							tr("QBat - critical battery capacity");
