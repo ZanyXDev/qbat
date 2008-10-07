@@ -28,12 +28,6 @@
      <layout class="QGridLayout" >
       <item row="0" column="0" >
        <widget class="QLabel" name="criticalCapacitylabel" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="text" >
          <string>Critical capacity (in %)</string>
         </property>
@@ -72,20 +66,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2" colspan="2" >
-       <spacer name="horizontalSpacer_3" >
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0" >
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="4" column="0" colspan="4" >
+      <item row="4" column="0" colspan="3" >
        <widget class="QGroupBox" name="confirmCommandBox" >
         <property name="title" >
          <string>Confirm command</string>
@@ -93,7 +74,7 @@
         <property name="checkable" >
          <bool>true</bool>
         </property>
-        <layout class="QGridLayout" name="gridLayout" >
+        <layout class="QGridLayout" >
          <item row="0" column="0" >
           <widget class="QCheckBox" name="timeoutCheck" >
            <property name="text" >
@@ -122,7 +103,7 @@
           </widget>
          </item>
          <item row="0" column="3" >
-          <spacer name="horizontalSpacer_4" >
+          <spacer name="spacer1" >
            <property name="orientation" >
             <enum>Qt::Horizontal</enum>
            </property>
@@ -137,8 +118,21 @@
         </layout>
        </widget>
       </item>
-      <item rowspan="2" row="2" column="1" colspan="3" >
+      <item rowspan="2" row="2" column="1" colspan="2" >
        <widget class="QLineEdit" name="criticalCommandEdit" />
+      </item>
+      <item row="0" column="2" >
+       <spacer name="spacer0" >
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>
@@ -248,7 +242,7 @@
        </widget>
       </item>
       <item rowspan="3" row="0" column="5" >
-       <spacer name="horizontalSpacer" >
+       <spacer name="spacer2" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
@@ -272,7 +266,6 @@
      <zorder>poleFullColorButton</zorder>
      <zorder>poleColorButton</zorder>
      <zorder>mergeBatteryCheck</zorder>
-     <zorder>horizontalSpacer</zorder>
     </widget>
    </item>
    <item>
@@ -311,7 +304,7 @@
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_2" >
+      <spacer name="spacer3" >
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
        </property>
@@ -326,7 +319,7 @@
     </layout>
    </item>
    <item>
-    <spacer name="verticalSpacer" >
+    <spacer name="spacer4" >
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>

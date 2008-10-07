@@ -31,6 +31,7 @@ namespace qbat {
 		
 		bool m_energyUnits;
 		
+		void updateIcon();
 		void updateToolTip();
 	public:
 		CBatteryIcon(QString batteryName, Settings * settings, QMenu * contextMenu, QObject * parent = 0);
@@ -39,7 +40,6 @@ namespace qbat {
 		QString batteryName() const { return m_BatteryName; }
 		
 		void updateData(int fullCapacity, int designCapacity, int currentCapacity, int rate, int voltage, int status, bool energyUnits);
-		void updateIcon();
 	};
 }
 
