@@ -111,7 +111,7 @@ namespace qbat {
 		newToolTip += '\n';
 		
 		if (m_energyUnits) {
-			if (m_Status != UI_BATTERY_FULL) {
+			if ((m_Rate) && (m_Status != UI_BATTERY_FULL)) {
 				double rateW = qRound(m_Rate / 100000.0) / 10.0;
 				double rateA = qRound((m_Rate / m_Voltage) / 1000.0) / 10.0;
 				newToolTip += tr("current rate: %1W / %2A").arg(rateW).arg(rateA) + '\n';
@@ -127,7 +127,7 @@ namespace qbat {
 		}
 		else
 		{
-			if (m_Status != UI_BATTERY_FULL) {
+			if ((m_Rate) && (m_Status != UI_BATTERY_FULL)) {
 				double rateA = m_Rate / 100000.0;
 				double rateW = qRound(rateA * m_Voltage / 100.0) / 10.0;
 				newToolTip += tr("current rate: %1W / %2A").arg(rateW).arg(qRound(rateA) / 10.0) + '\n';
