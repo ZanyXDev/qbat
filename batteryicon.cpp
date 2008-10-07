@@ -65,7 +65,7 @@ namespace qbat {
 		painter.setRenderHint(QPainter::TextAntialiasing);
 		((QFont&)painter.font()).setBold(true);
 		if (m_RelativeCharge == -1)
-			painter.drawText(1, 9, 26, 16, Qt::AlignHCenter, '?');
+			painter.drawText(1, 9, 26, 16, Qt::AlignHCenter, QString('?'));
 		else
 			painter.drawText(1, 9, 26, 16, Qt::AlignHCenter, QString::number(m_RelativeCharge));
 		
