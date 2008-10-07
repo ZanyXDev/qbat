@@ -1,3 +1,12 @@
+qbat (0.1.8) unstable; urgency=low
+
+  * code cleanup
+  * display current rate in watt and ampere
+  * fixed repeated critical event handling
+  * workaround for delayed update of battery icon colors
+
+ -- Oliver Groß <neokensuke@freenet.de>  Tue, 07 Oct 2008 16:03:45 +0200
+
 qbat (0.1.7) unstable; urgency=low
 
   * fixed "command<->waring" setting
