@@ -22,15 +22,15 @@ namespace qbat {
 		
 		qint8 m_RelativeCharge;
 		
-		int m_ChargeFull;
-		int m_ChargeFullDesign;
-		int m_ChargeNow;
-		int m_CurrentNow;
+		int m_FullCapacity;
+		int m_DesignCapacity;
+		int m_CurrentCapacity;
+		int m_Rate;
+		int m_Voltage;
 		int m_Status;
 		
 		bool m_energyUnits;
 		
-		void updateIcon();
 		void updateToolTip();
 	public:
 		CBatteryIcon(QString batteryName, Settings * settings, QMenu * contextMenu, QObject * parent = 0);
@@ -38,7 +38,8 @@ namespace qbat {
 		
 		QString batteryName() const { return m_BatteryName; }
 		
-		void updateData(int chargeFull, int chargeFullDesign, int chargeNow, int currentNow, int status, bool energyUnits);
+		void updateData(int fullCapacity, int designCapacity, int currentCapacity, int rate, int voltage, int status, bool energyUnits);
+		void updateIcon();
 	};
 }
 

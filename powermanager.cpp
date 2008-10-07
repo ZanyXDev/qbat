@@ -112,12 +112,15 @@ namespace qbat {
 			int currentNow = 0;
 			int status = 0;
 			
+			int voltage = 0;
+			
 			bool energyUnits = false;
 			
 			int relativeCapacity = 100;
 			
 			if (m_Settings.mergeBatterys) {
 				int batteryCount = 0;
+				int voltageBuffer;
 				foreach(QString i, powerSupplies) {
 					string buffer = readStringSysFile(m_SysfsDir.filePath(i + "/type").toAscii().constData());
 					
@@ -128,13 +131,14 @@ namespace qbat {
 					else if (buffer == "Battery") {
 						energyUnits = m_SysfsDir.exists(i + UI_CAPTION_NOW(UI_CAPTION_ENERGY));
 						
+						voltageBuffer = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_VOLTAGE)).toAscii().constData()) / 10000;
 						if (energyUnits) {
-							double voltage = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_VOLTAGE)).toAscii().constData()) / 1000000.0;
+							double voltageNorm  = voltageBuffer / 100.0;
 							
-							chargeFull       += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_FULL(UI_CAPTION_ENERGY)).toAscii().constData()) / voltage);
-							chargeFullDesign += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_DESIGN(UI_CAPTION_ENERGY)).toAscii().constData()) / voltage);
-							chargeNow        += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_ENERGY)).toAscii().constData()) / voltage);
-							currentNow       += qRound(readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData()) / voltage);
+							chargeFull       += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_FULL(UI_CAPTION_ENERGY)).toAscii().constData()) / voltageNorm);
+							chargeFullDesign += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_DESIGN(UI_CAPTION_ENERGY)).toAscii().constData()) / voltageNorm);
+							chargeNow        += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_ENERGY)).toAscii().constData()) / voltageNorm);
+							currentNow       += qRound(readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData()) / voltageNorm);
 						}
 						else {
 							chargeFull       += readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_FULL(UI_CAPTION_CHARGE)).toAscii().constData());
@@ -142,6 +146,7 @@ namespace qbat {
 							chargeNow        += readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_CHARGE)).toAscii().constData());
 							currentNow       += readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData());
 						}
+						voltage += voltageBuffer;
 						
 						int statusBuffer = toStatusInt(readStringSysFile(m_SysfsDir.filePath(i + "/status").toAscii().constData()));
 						
@@ -160,22 +165,22 @@ namespace qbat {
 					chargeFullDesign /= batteryCount;
 					chargeNow        /= batteryCount;
 					currentNow       /= batteryCount;
+					voltage          /= batteryCount;
 					
 					if (!m_BatteryIcons.contains("merged")) {
 						if (!m_BatteryIcons.isEmpty()) {
-							foreach(CBatteryIcon * i, m_BatteryIcons) {
+							foreach(CBatteryIcon * i, m_BatteryIcons)
 								delete i;
-							}
 							
 							m_BatteryIcons.clear();
 						}
 						
 						CBatteryIcon * currentBatteryIcon = new CBatteryIcon("average", &m_Settings, &m_ContextMenu, this);
-						currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, status, false);
+						currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, voltage, status, false);
 						m_BatteryIcons.insert("merged", currentBatteryIcon);
 					}
 					else
-						m_BatteryIcons["merged"]->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, status, false);
+						m_BatteryIcons["merged"]->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, voltage, status, false);
 				}
 				else {
 					delete m_BatteryIcons.take("merged");
@@ -208,19 +213,20 @@ namespace qbat {
 							chargeFullDesign = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_DESIGN(UI_CAPTION_CHARGE)).toAscii().constData());
 							chargeNow        = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_CHARGE)).toAscii().constData());
 						}
-						currentNow       = readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData());
-						status           = toStatusInt(readStringSysFile(m_SysfsDir.filePath(i + "/status").toAscii().constData()));
+						currentNow = readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData());
+						voltage    = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_VOLTAGE)).toAscii().constData()) / 10000;
+						status     = toStatusInt(readStringSysFile(m_SysfsDir.filePath(i + "/status").toAscii().constData()));
 						
 						chargeFullMid += chargeFull;
 						chargeNowMid += chargeNow;
 						
-						if (!m_BatteryIcons.contains(i)) {
-							currentBatteryIcon = new CBatteryIcon(i, &m_Settings, &m_ContextMenu, this);
-							currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, status, energyUnits);
+						if (m_BatteryIcons.contains(i)) {
+							currentBatteryIcon = m_BatteryIcons.take(i);
+							currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, voltage, status, energyUnits);
 						}
 						else {
-							currentBatteryIcon = m_BatteryIcons.take(i);
-							currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, status, energyUnits);
+							currentBatteryIcon = new CBatteryIcon(i, &m_Settings, &m_ContextMenu, this);
+							currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, voltage, status, energyUnits);
 							m_CriticalHandled = false;
 						}
 						newBatteryIcons << currentBatteryIcon;
@@ -282,10 +288,17 @@ namespace qbat {
 	
 	void CPowerManager::showSettings() {
 		CSettings dialog;
-		connect(&dialog, SIGNAL(settingsChanged()), this, SLOT(updateData()));
-		connect(&dialog, SIGNAL(settingsChanged()), this, SLOT(restartTimer()));
 		
-		dialog.execute(&m_Settings);
+		if (dialog.execute(&m_Settings)) {
+			foreach(CBatteryIcon * i, m_BatteryIcons) {
+				delete i;
+			}
+			
+			m_BatteryIcons.clear();
+			
+			updateData();
+			restartTimer();
+		}
 	}
 	
 	void CPowerManager::showAbout() {
