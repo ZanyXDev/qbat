@@ -252,7 +252,9 @@ namespace qbat {
 			}
 			else {
 				if (m_Settings.handleCritical) {
-					if ((relativeCapacity <= m_Settings.criticalCapacity) && (!m_CriticalHandled)) {
+					if (relativeCapacity > m_Settings.criticalCapacity)
+						m_CriticalHandled = false;
+					else if (!m_CriticalHandled) {
 						QString msgTitle = (m_Settings.executeCommand && m_Settings.confirmWithTimeout) ?
 							tr("QBat - critical battery capacity (will automatically choose ok on timeout)"):
 							tr("QBat - critical battery capacity");
@@ -269,8 +271,6 @@ namespace qbat {
 						}
 						m_CriticalHandled = true;
 					}
-					else
-						m_CriticalHandled = false;
 				}
 				m_DefaultTrayIcon.setToolTip("QBat - " + tr("AC adapter unplugged"));
 			}
