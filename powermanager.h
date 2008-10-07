@@ -1,5 +1,5 @@
 //
-// C++ Interface: cpowermanager
+// C++ Interface: powermanager
 //
 // Author: Oliver Groß <z.o.gross@gmx.de>, (C) 2008
 //
@@ -21,8 +21,6 @@ namespace qbat {
 	class CPowerManager : public QObject {
 		Q_OBJECT
 	private:
-		enum messageType {MSGT_INFORMATION, MSGT_WARNING};
-		
 		int m_Timer;
 		bool m_CriticalHandled;
 		QDir m_SysfsDir;

@@ -42,8 +42,6 @@ namespace qbat {
 		
 		m_Settings->showBalloon = ui.showBalloonCheck->isChecked();
 		m_Settings->pollingRate = ui.pollingRateSpin->value();
-		
-		emit settingsChanged();
 	}
 	
 	bool CSettings::execute(Settings * settings) {

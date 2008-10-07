@@ -1,5 +1,5 @@
 //
-// C++ Implementation: cpowermanager
+// C++ Implementation: powermanager
 //
 // Author: Oliver Groß <z.o.gross@gmx.de>, (C) 2008
 //

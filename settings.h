@@ -30,8 +30,6 @@ namespace qbat {
 		bool execute(Settings * settings);
 	private slots:
 		void editColor(int id);
-	signals:
-		void settingsChanged();
 	};
 }
 
