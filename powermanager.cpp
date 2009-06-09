@@ -109,6 +109,7 @@ namespace qbat {
 	
 	void CPowerManager::updateSupplies() {
 		if (CBatteryIcon::sysfsDir.exists()) {
+			bool oldAC = m_ACPlug;
 			m_ACPlug = false;
 			
 			QStringList powerSupplies = CBatteryIcon::sysfsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -132,7 +133,6 @@ namespace qbat {
 						currentBatteryIcon = new CBatteryIcon(i, &m_Settings, &m_ContextMenu, this);
 						currentBatteryIcon->updateData();
 						currentBatteryIcon->updateIcon();
-						updateMergedData();
 						m_CriticalHandled = false;
 					}
 					newBatteryIcons << currentBatteryIcon;
@@ -142,11 +142,11 @@ namespace qbat {
 			foreach(CBatteryIcon * i, m_BatteryIcons)
 				delete i;
 			
-			//TODO check if this doesn't imply mem leaks
 			m_BatteryIcons.clear();
 			
 			foreach(CBatteryIcon * i, newBatteryIcons)
 				m_BatteryIcons.insert(i->batteryName(), i);
+			
 			
 			m_DefaultTrayIcon.setVisible(m_BatteryIcons.isEmpty());
 			
@@ -154,6 +154,11 @@ namespace qbat {
 				m_DefaultTrayIcon.setToolTip("QBat - " + tr("AC adapter plugged in"));
 			else
 				m_DefaultTrayIcon.setToolTip("QBat - " + tr("AC adapter unplugged"));
+			
+			if (oldAC != m_ACPlug)
+				updateBatteryData();
+			else
+				updateMergedData();
 			
 			checkCritical();
 		}
