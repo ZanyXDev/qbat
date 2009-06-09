@@ -17,27 +17,32 @@ namespace qbat {
 	
 	CPowerManager::CPowerManager(QObject * parent) :
 		QObject(parent),
+		m_Timer(-1),
+		m_DataTimer(-1),
+		m_RelativeCapacity(100),
+		m_ACPlug(false),
 		m_CriticalHandled(false),
-		m_SysfsDir(UI_PATH_SYSFS_DIR),
 		m_SettingsFile(UI_FILE_CONFIG, QSettings::IniFormat, this),
-		m_DefaultTrayIcon(QIcon(UI_ICON_QBAT), this)
+		m_DefaultTrayIcon(QIcon(UI_ICON_QBAT_SMALL), this)
 	{
 		readSettings();
-		m_ContextMenu.addAction(tr("&Settings"), this, SLOT(showSettings()))->setEnabled(m_SysfsDir.exists());
+		m_ContextMenu.addAction(tr("&Settings"), this, SLOT(showSettings()))->setEnabled(CBatteryIcon::sysfsDir.exists());
 		m_ContextMenu.addAction(tr("&About"), this, SLOT(showAbout()));
 		m_ContextMenu.addSeparator();
 		m_ContextMenu.addAction(tr("&Quit"), qApp, SLOT(quit()));
 		
 		m_DefaultTrayIcon.setContextMenu(&m_ContextMenu);
 		
-		timerEvent(NULL);
-		if (m_SysfsDir.exists()) {
+		if (CBatteryIcon::sysfsDir.exists()) {
+			m_DataTimer = startTimer(15000);
 			m_Timer = startTimer(m_Settings.pollingRate);
 		}
+		updateSupplies();
 	}
 	
 	CPowerManager::~CPowerManager() {
 		killTimer(m_Timer);
+		killTimer(m_DataTimer);
 		writeSettings();
 	}
 	
@@ -48,7 +53,6 @@ namespace qbat {
 		m_SettingsFile.endGroup();
 		
 		m_SettingsFile.beginGroup("TrayIcons");
-		m_Settings.mergeBatterys = m_SettingsFile.value("mergeBatterys", true).toBool();
 		m_Settings.colors[UI_COLOR_PEN] = m_SettingsFile.value("textColor", 0).toUInt();
 		m_Settings.colors[UI_COLOR_PEN_FULL] = m_SettingsFile.value("textFullColor", 0).toUInt();
 		m_Settings.colors[UI_COLOR_BRUSH_CHARGED] = m_SettingsFile.value("mainChargedColor", qRgb( 0, 255, 0)).toUInt();
@@ -76,7 +80,6 @@ namespace qbat {
 		m_SettingsFile.endGroup();
 		
 		m_SettingsFile.beginGroup("TrayIcons");
-		m_SettingsFile.setValue("mergeBatterys", m_Settings.mergeBatterys);
 		m_SettingsFile.setValue("textColor", m_Settings.colors[UI_COLOR_PEN]);
 		m_SettingsFile.setValue("textFullColor", m_Settings.colors[UI_COLOR_PEN_FULL]);
 		m_SettingsFile.setValue("mainChargedColor", m_Settings.colors[UI_COLOR_BRUSH_CHARGED]);
@@ -97,206 +100,133 @@ namespace qbat {
 		m_SettingsFile.endGroup();
 	}
 	
-	void CPowerManager::timerEvent(QTimerEvent *) {
-		updateData();
+	void CPowerManager::timerEvent(QTimerEvent * event) {
+		if (event->timerId() == m_Timer)
+			updateSupplies();
+		else if (event->timerId() == m_DataTimer)
+			updateBatteryData();
 	}
 	
-	void CPowerManager::updateData() {
-		if (m_SysfsDir.exists()) {
-			bool acPlug = false;
-			QStringList powerSupplies = m_SysfsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+	void CPowerManager::updateSupplies() {
+		if (CBatteryIcon::sysfsDir.exists()) {
+			m_ACPlug = false;
 			
-			int chargeFull = 0;
-			int chargeFullDesign = 0;
-			int chargeNow = 0;
-			int currentNow = 0;
-			int status = 0;
+			QStringList powerSupplies = CBatteryIcon::sysfsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
 			
-			int voltage = 0;
+			QList<CBatteryIcon *> newBatteryIcons;
+			CBatteryIcon * currentBatteryIcon;
 			
-			bool energyUnits = false;
-			
-			int relativeCapacity = 100;
-			
-			if (m_Settings.mergeBatterys) {
-				int batteryCount = 0;
-				int voltageBuffer;
-				foreach(QString i, powerSupplies) {
-					string buffer = readStringSysFile(m_SysfsDir.filePath(i + "/type").toAscii().constData());
-					
-					if ((!acPlug) && (buffer == "Mains")) {
-						if (1 == readIntSysFile(m_SysfsDir.filePath(i + "/online").toAscii().constData()))
-							acPlug = true;
+			foreach(QString i, powerSupplies) {
+				// this is possibly not very reliable
+				if (CBatteryIcon::sysfsDir.exists(i + "/online")) {
+					if (readIntSysFile(CBatteryIcon::sysfsDir.filePath(i + "/online").toAscii().constData()) == 1) {
+						m_ACPlug = true;
+						m_CriticalHandled = false;
 					}
-					else if (buffer == "Battery") {
-						energyUnits = m_SysfsDir.exists(i + UI_CAPTION_NOW(UI_CAPTION_ENERGY));
-						
-						voltageBuffer = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_VOLTAGE)).toAscii().constData()) / 10000;
-						if (energyUnits) {
-							double voltageNorm  = voltageBuffer / 100.0;
-							
-							chargeFull       += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_FULL(UI_CAPTION_ENERGY)).toAscii().constData()) / voltageNorm);
-							chargeFullDesign += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_DESIGN(UI_CAPTION_ENERGY)).toAscii().constData()) / voltageNorm);
-							chargeNow        += qRound(readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_ENERGY)).toAscii().constData()) / voltageNorm);
-							currentNow       += qRound(readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData()) / voltageNorm);
-						}
-						else {
-							chargeFull       += readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_FULL(UI_CAPTION_CHARGE)).toAscii().constData());
-							chargeFullDesign += readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_DESIGN(UI_CAPTION_CHARGE)).toAscii().constData());
-							chargeNow        += readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_CHARGE)).toAscii().constData());
-							currentNow       += readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData());
-						}
-						voltage += voltageBuffer;
-						
-						int statusBuffer = toStatusInt(readStringSysFile(m_SysfsDir.filePath(i + "/status").toAscii().constData()));
-						
-						if ((!status) || (statusBuffer != UI_BATTERY_FULL))
-							status = statusBuffer;
-						
-						batteryCount++;
-					}
-				}
-				
-				if (batteryCount) {
-					if (m_Settings.handleCritical)
-						relativeCapacity = (int)(100.0 * chargeNow / chargeFull);
-					
-					chargeFull       /= batteryCount;
-					chargeFullDesign /= batteryCount;
-					chargeNow        /= batteryCount;
-					currentNow       /= batteryCount;
-					voltage          /= batteryCount;
-					
-					if (!m_BatteryIcons.contains("merged")) {
-						if (!m_BatteryIcons.isEmpty()) {
-							foreach(CBatteryIcon * i, m_BatteryIcons)
-								delete i;
-							
-							m_BatteryIcons.clear();
-						}
-						
-						CBatteryIcon * currentBatteryIcon = new CBatteryIcon("average", &m_Settings, &m_ContextMenu, this);
-						currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, voltage, status, false);
-						m_BatteryIcons.insert("merged", currentBatteryIcon);
-					}
-					else
-						m_BatteryIcons["merged"]->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, voltage, status, false);
 				}
 				else {
-					delete m_BatteryIcons.take("merged");
-				}
-			}
-			else {
-				QList<CBatteryIcon *> newBatteryIcons;
-				CBatteryIcon * currentBatteryIcon;
-				
-				int chargeNowMid = 0;
-				int chargeFullMid = 0;
-				
-				foreach(QString i, powerSupplies) {
-					string buffer = readStringSysFile(m_SysfsDir.filePath(i + "/type").toAscii().constData());
-					
-					if (buffer == "Mains") {
-						if (1 == readIntSysFile(m_SysfsDir.filePath(i + "/online").toAscii().constData()))
-							acPlug = true;
+					if (m_BatteryIcons.contains(i)) {
+						currentBatteryIcon = m_BatteryIcons.take(i);
 					}
-					else if (buffer == "Battery") {
-						energyUnits = m_SysfsDir.exists(i + UI_CAPTION_NOW(UI_CAPTION_ENERGY));
-						
-						if (energyUnits) {
-							chargeFull       = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_FULL(UI_CAPTION_ENERGY)).toAscii().constData());
-							chargeFullDesign = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_DESIGN(UI_CAPTION_ENERGY)).toAscii().constData());
-							chargeNow        = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_ENERGY)).toAscii().constData());
-						}
-						else {
-							chargeFull       = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_FULL(UI_CAPTION_CHARGE)).toAscii().constData());
-							chargeFullDesign = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_DESIGN(UI_CAPTION_CHARGE)).toAscii().constData());
-							chargeNow        = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_CHARGE)).toAscii().constData());
-						}
-						currentNow = readIntSysFile(m_SysfsDir.filePath(i + "/current_now").toAscii().constData());
-						voltage    = readIntSysFile(m_SysfsDir.filePath(i + UI_CAPTION_NOW(UI_CAPTION_VOLTAGE)).toAscii().constData()) / 10000;
-						status     = toStatusInt(readStringSysFile(m_SysfsDir.filePath(i + "/status").toAscii().constData()));
-						
-						chargeFullMid += chargeFull;
-						chargeNowMid += chargeNow;
-						
-						if (m_BatteryIcons.contains(i)) {
-							currentBatteryIcon = m_BatteryIcons.take(i);
-							currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, voltage, status, energyUnits);
-						}
-						else {
-							currentBatteryIcon = new CBatteryIcon(i, &m_Settings, &m_ContextMenu, this);
-							currentBatteryIcon->updateData(chargeFull, chargeFullDesign, chargeNow, currentNow, voltage, status, energyUnits);
-							m_CriticalHandled = false;
-						}
-						newBatteryIcons << currentBatteryIcon;
+					else {
+						currentBatteryIcon = new CBatteryIcon(i, &m_Settings, &m_ContextMenu, this);
+						currentBatteryIcon->updateData();
+						currentBatteryIcon->updateIcon();
+						updateMergedData();
+						m_CriticalHandled = false;
 					}
+					newBatteryIcons << currentBatteryIcon;
 				}
-				
-				foreach(CBatteryIcon * i, m_BatteryIcons) {
-					delete i;
-				}
-				
-				m_BatteryIcons.clear();
-				
-				foreach(CBatteryIcon * i, newBatteryIcons)
-					m_BatteryIcons.insert(i->batteryName(), i);
-				
-				if (!m_BatteryIcons.isEmpty())
-					relativeCapacity = (int)(100.0 * chargeNowMid / chargeFullMid);
 			}
 			
-			if (acPlug) {
+			foreach(CBatteryIcon * i, m_BatteryIcons)
+				delete i;
+			
+			//TODO check if this doesn't imply mem leaks
+			m_BatteryIcons.clear();
+			
+			foreach(CBatteryIcon * i, newBatteryIcons)
+				m_BatteryIcons.insert(i->batteryName(), i);
+			
+			m_DefaultTrayIcon.setVisible(m_BatteryIcons.isEmpty());
+			
+			if (m_ACPlug)
 				m_DefaultTrayIcon.setToolTip("QBat - " + tr("AC adapter plugged in"));
-				m_CriticalHandled = false;
-			}
-			else {
-				if (m_Settings.handleCritical) {
-					if (relativeCapacity > m_Settings.criticalCapacity)
-						m_CriticalHandled = false;
-					else if (!m_CriticalHandled) {
-						QString msgTitle = (m_Settings.executeCommand && m_Settings.confirmWithTimeout) ?
-							tr("QBat - critical battery capacity (will automatically choose ok on timeout)"):
-							tr("QBat - critical battery capacity");
-						QString msgText = (m_Settings.executeCommand && m_Settings.confirmCommand) ?
-							tr("WARNING: The attached battery(s) reached the critical mark.\nClick cancel and please make sure to save and shut down soon or provide another source of power\nor:\nClick ok to execute:\n%1").arg(m_Settings.criticalCommand) :
-							tr("WARNING: The attached battery(s) reached the critical mark.\nPlease make sure to save and shut down soon or provide another source of power.");
-						if (m_Settings.executeCommand && (!m_Settings.confirmCommand || ((m_Settings.confirmWithTimeout) ? QTimerMessageBox::warning(NULL, msgTitle, msgText, m_Settings.timeoutValue, QMessageBox::Ok | QMessageBox::Cancel) : QMessageBox::warning(NULL, msgTitle, msgText, QMessageBox::Ok | QMessageBox::Cancel))))
-							QProcess::startDetached(m_Settings.criticalCommand);
-						else {
-							if (m_Settings.showBalloon)
-								m_BatteryIcons.begin().value()->showMessage(msgTitle, msgText, QSystemTrayIcon::Warning, 7000);
-							else
-								QMessageBox::warning(NULL, msgTitle, msgText);
-						}
-						m_CriticalHandled = true;
-					}
-				}
+			else
 				m_DefaultTrayIcon.setToolTip("QBat - " + tr("AC adapter unplugged"));
-			}
+			
+			checkCritical();
 		}
-		else
+		else {
 			m_DefaultTrayIcon.setToolTip("QBat - " + tr("no information available"));
+			m_DefaultTrayIcon.setVisible(true);
+		}
 		
-		m_DefaultTrayIcon.setVisible(m_BatteryIcons.isEmpty());
+	}
+	
+	void CPowerManager::updateMergedData() {
+		m_RelativeCapacity = 0;
+		foreach (CBatteryIcon * battery, m_BatteryIcons) {
+			if (battery->relativeCharge() != -1)
+				m_RelativeCapacity += battery->relativeCharge();
+		}
+		
+		if (!m_RelativeCapacity)
+			m_RelativeCapacity = -1;
+	}
+	
+	void CPowerManager::checkCritical() {
+		if (m_ACPlug || m_CriticalHandled || m_RelativeCapacity == -1 || !m_Settings.handleCritical || m_RelativeCapacity > m_Settings.criticalCapacity)
+			return;
+		
+		QString msgTitle = (m_Settings.executeCommand && m_Settings.confirmWithTimeout) ?
+			tr("QBat - critical battery capacity (will automatically choose ok on timeout)"):
+			tr("QBat - critical battery capacity");
+		QString msgText = (m_Settings.executeCommand && m_Settings.confirmCommand) ?
+			tr("WARNING: The attached battery(s) reached the critical mark.\n"
+			"Click cancel and please make sure to save and shut down soon or provide another source of power\n"
+			"or:\n"
+			"Click ok to execute:\n%1").arg(m_Settings.criticalCommand) :
+			tr("WARNING: The attached battery(s) reached the critical mark.\n"
+			"Please make sure to save and shut down soon or provide another source of power.");
+		if (m_Settings.executeCommand && (!m_Settings.confirmCommand || (QTimerMessageBox::warning(NULL, msgTitle, msgText,
+			(m_Settings.confirmWithTimeout) ? m_Settings.timeoutValue : -1, QMessageBox::Ok | QMessageBox::Cancel))))
+			QProcess::startDetached(m_Settings.criticalCommand);
+		else {
+			if (m_Settings.showBalloon)
+				m_BatteryIcons.begin().value()->showMessage(msgTitle, msgText, QSystemTrayIcon::Warning, 7000);
+			else
+				QMessageBox::warning(NULL, msgTitle, msgText);
+		}
+		m_CriticalHandled = true;
+	}
+	
+	void CPowerManager::updateBatteryData() {
+		foreach (CBatteryIcon * battery, m_BatteryIcons)
+			battery->updateData();
+		
+		updateMergedData();
+		checkCritical();
 	}
 	
 	void CPowerManager::restartTimer() {
 		killTimer(m_Timer);
 		m_Timer = startTimer(m_Settings.pollingRate);
+		killTimer(m_DataTimer);
+		m_DataTimer = startTimer(15000);
 	}
 	
 	void CPowerManager::showSettings() {
 		CSettings dialog;
 		
 		if (dialog.execute(&m_Settings)) {
-			foreach(CBatteryIcon * i, m_BatteryIcons) {
+			foreach (CBatteryIcon * i, m_BatteryIcons) {
 				delete i;
 			}
 			
 			m_BatteryIcons.clear();
 			
-			updateData();
+			updateSupplies();
 			restartTimer();
 		}
 	}
@@ -313,8 +243,8 @@ namespace qbat {
 		else {
 			QMessageBox aboutBox;
 			
-			aboutBox.setWindowIcon(QIcon(UI_ICON_QBAT));
-			aboutBox.setIconPixmap(QPixmap(UI_ICON_QBAT));
+			aboutBox.setWindowIcon(QIcon(UI_ICON_QBAT_SMALL));
+			aboutBox.setIconPixmap(QPixmap(UI_ICON_QBAT_LARGE));
 			aboutBox.setWindowTitle(tr("About QBat"));
 			aboutBox.setText(UI_NAME + "\nv" + QString(UI_VERSION));
 			aboutBox.setStandardButtons(QMessageBox::Ok);

@@ -11,6 +11,8 @@
 namespace qbat {
 	CSettings::CSettings(QWidget * parent) : QDialog(parent) {
 		ui.setupUi(this);
+		setWindowIcon(QIcon(UI_ICON_QBAT_SMALL));
+		
 		colorSelectButtons.setExclusive(false);
 		colorSelectButtons.addButton(ui.mainFullColorButton, 1 + UI_COLOR_BRUSH_FULL);
 		colorSelectButtons.addButton(ui.mainChargedColorButton, 1 + UI_COLOR_BRUSH_CHARGED);
@@ -38,7 +40,7 @@ namespace qbat {
 		for (int i = 0; i < UI_COUNT_COLORS; i++)
 			m_Settings->colors[i] = colors[i];
 		
-		m_Settings->mergeBatterys = ui.mergeBatteryCheck->isChecked();
+// 		m_Settings->mergeBatteries = ui.mergeBatteryCheck->isChecked();
 		
 		m_Settings->showBalloon = ui.showBalloonCheck->isChecked();
 		m_Settings->pollingRate = ui.pollingRateSpin->value();
@@ -67,7 +69,7 @@ namespace qbat {
 				colors[i] = settings->colors[i];
 			}
 		}
-		ui.mergeBatteryCheck->setChecked(settings->mergeBatterys);
+// 		ui.mergeBatteryCheck->setChecked(settings->mergeBatteries);
 		
 		ui.pollingRateSpin->setValue(settings->pollingRate);
 		ui.showBalloonCheck->setChecked(settings->showBalloon);

@@ -22,8 +22,13 @@ namespace qbat {
 		Q_OBJECT
 	private:
 		int m_Timer;
+		int m_DataTimer;
+		
+		int m_RelativeCapacity;
+		
+		bool m_ACPlug;
 		bool m_CriticalHandled;
-		QDir m_SysfsDir;
+// 		QDir m_SysfsDir;
 		
 		Settings m_Settings;
 		QSettings m_SettingsFile;
@@ -40,8 +45,15 @@ namespace qbat {
 	public:
 		CPowerManager(QObject * parent = 0);
 		~CPowerManager();
+	private:
+/*		void updateMerged(QStringList & powerSupplies, bool & acPlug, int & relativeCapacity);
+		void updateSeparated(QStringList & powerSupplies, bool & acPlug, int & relativeCapacity);*/
+		void updateSupplies();
+		void updateMergedData();
+		void checkCritical();
 	private slots:
-		void updateData();
+		void updateBatteryData();
+// 		void updateData();
 		void restartTimer();
 	public slots:
 		void showSettings();

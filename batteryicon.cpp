@@ -7,24 +7,31 @@
 //
 #include "batteryicon.h"
 #include "common.h"
-#include <string>
-#include <QDir>
 #include <QPainter>
 
 namespace qbat {
-	using namespace std;
+	QDir CBatteryIcon::sysfsDir(UI_PATH_SYSFS_DIR);
 	
 	CBatteryIcon::CBatteryIcon(QString batteryName, Settings * settings, QMenu * contextMenu, QObject * parent) :
 		QSystemTrayIcon(parent),
 		m_BatteryName(batteryName),
 		m_Icon(28, 28),
 		m_Settings(settings),
-		m_energyUnits(false)
+		
+		m_RelativeCharge(-1),
+		
+		m_FullCapacity(0),
+		m_DesignCapacity(0),
+		m_CurrentCapacity(0),
+		m_Rate(0),
+		m_Voltage(0),
+		m_Status(0),
+		
+		m_EnergyUnits(false)
 	{
 		m_Icon.fill(Qt::transparent);
 		setIcon(m_Icon);
 		setContextMenu(contextMenu);
-		//updateData();
 		show();
 	}
 	
@@ -110,7 +117,7 @@ namespace qbat {
 		}
 		newToolTip += '\n';
 		
-		if (m_energyUnits) {
+		if (m_EnergyUnits) {
 			if ((m_Rate) && (m_Status != UI_BATTERY_FULL)) {
 				double rateW = qRound(m_Rate / 100000.0) / 10.0;
 				double rateA = qRound((m_Rate / m_Voltage) / 1000.0) / 10.0;
@@ -144,38 +151,62 @@ namespace qbat {
 		setToolTip(newToolTip);
 	}
 	
-	void CBatteryIcon::updateData(int fullCapacity, int designCapacity, int currentCapacity, int rate, int voltage, int status, bool energyUnits) {
+	void CBatteryIcon::updateData() {
+		int intBuffer;
 		bool noupdate = true;
-		m_energyUnits = energyUnits;
 		
-		if (currentCapacity != m_CurrentCapacity) {
+		m_EnergyUnits = sysfsDir.exists(m_BatteryName + UI_CAPTION_NOW(UI_CAPTION_ENERGY));
+		
+		intBuffer = readIntSysFile(sysfsDir.filePath(m_BatteryName + "/current_now").toAscii().constData());
+		if (intBuffer != m_Rate) {
 			noupdate = false;
-			m_CurrentCapacity = currentCapacity;
+			m_Rate = intBuffer;
 		}
 		
-		if (rate != m_Rate) {
+		intBuffer = readIntSysFile(sysfsDir.filePath(m_BatteryName + UI_CAPTION_NOW(UI_CAPTION_VOLTAGE)).toAscii().constData()) / 10000;
+		if (intBuffer != m_Voltage) {
 			noupdate = false;
-			m_Rate = rate;
+			m_Voltage = intBuffer;
 		}
 		
-		if (status != m_Status) {
-			noupdate = false;
-			m_Status = status;
+		{
+			char buffer[BUF_SIZE];
+			readStringFromFile(buffer, sysfsDir.filePath(m_BatteryName + "/status").toAscii().constData());
+			intBuffer = toStatusInt(buffer);
+			
+			if (intBuffer != m_Status) {
+				noupdate = false;
+				m_Status = intBuffer;
+			}
 		}
 		
-		if (fullCapacity != m_FullCapacity) {
-			noupdate = false;
-			m_FullCapacity = fullCapacity;
-		}
-		
-		if (designCapacity != m_DesignCapacity) {
-			noupdate = false;
-			m_DesignCapacity = designCapacity;
-		}
-		
-		if (voltage != m_Voltage) {
-			noupdate = false;
-			m_Voltage = voltage;
+		{
+			int intBuffer[3];
+			if (m_EnergyUnits) {
+				intBuffer[0] = readIntSysFile(sysfsDir.filePath(m_BatteryName + UI_CAPTION_FULL(UI_CAPTION_ENERGY)).toAscii().constData());
+				intBuffer[1] = readIntSysFile(sysfsDir.filePath(m_BatteryName + UI_CAPTION_DESIGN(UI_CAPTION_ENERGY)).toAscii().constData());
+				intBuffer[2] = readIntSysFile(sysfsDir.filePath(m_BatteryName + UI_CAPTION_NOW(UI_CAPTION_ENERGY)).toAscii().constData());
+			}
+			else {
+				intBuffer[0] = readIntSysFile(sysfsDir.filePath(m_BatteryName + UI_CAPTION_FULL(UI_CAPTION_CHARGE)).toAscii().constData());
+				intBuffer[1] = readIntSysFile(sysfsDir.filePath(m_BatteryName + UI_CAPTION_DESIGN(UI_CAPTION_CHARGE)).toAscii().constData());
+				intBuffer[2] = readIntSysFile(sysfsDir.filePath(m_BatteryName + UI_CAPTION_NOW(UI_CAPTION_CHARGE)).toAscii().constData());
+			}
+			
+			if (intBuffer[0] != m_FullCapacity) {
+				noupdate = false;
+				m_FullCapacity = intBuffer[0];
+			}
+			
+			if (intBuffer[1] != m_DesignCapacity) {
+				noupdate = false;
+				m_DesignCapacity = intBuffer[1];
+			}
+			
+			if (intBuffer[2] != m_CurrentCapacity) {
+				noupdate = false;
+				m_CurrentCapacity = intBuffer[2];
+			}
 		}
 		
 		if (noupdate)
@@ -191,7 +222,9 @@ namespace qbat {
 		
 		if (newRelativeCharge != m_RelativeCharge) {
 			m_RelativeCharge = newRelativeCharge;
-			updateIcon();
+			
+			if (isVisible())
+				updateIcon();
 		}
 		
 		updateToolTip();

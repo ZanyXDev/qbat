@@ -24,7 +24,7 @@ DESTDIR = .
 
 target.path = /usr/bin
 iconstarget.path = /usr/share/qbat/icons
-iconstarget.files = res/*.png res/qbat.svg
+iconstarget.files = res/qbat*.svg
 langtarget.path = /usr/share/qbat/lang
 langtarget.files = qbat_*.qm
 shortcuttarget.path = /usr/share/applications
@@ -41,4 +41,5 @@ powermanager.h \
 TARGET = qbat
 
 FORMS += settingsdialog.ui
+
 

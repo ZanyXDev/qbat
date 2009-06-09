@@ -9,6 +9,7 @@
 #define QBAT_BATTERYICON_H
 
 #include <QSystemTrayIcon>
+#include <QDir>
 
 namespace qbat {
 	struct Settings;
@@ -29,17 +30,22 @@ namespace qbat {
 		int m_Voltage;
 		int m_Status;
 		
-		bool m_energyUnits;
+		bool m_EnergyUnits;
 		
-		void updateIcon();
+// 		void updateIcon();
 		void updateToolTip();
 	public:
+		static QDir sysfsDir;
+		
 		CBatteryIcon(QString batteryName, Settings * settings, QMenu * contextMenu, QObject * parent = 0);
 		~CBatteryIcon();
 		
 		QString batteryName() const { return m_BatteryName; }
+		qint8 relativeCharge() const { return m_RelativeCharge; }
 		
-		void updateData(int fullCapacity, int designCapacity, int currentCapacity, int rate, int voltage, int status, bool energyUnits);
+// 		void updateMergedData();
+		void updateData();
+		void updateIcon();
 	};
 }
 

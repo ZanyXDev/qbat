@@ -50,7 +50,7 @@ inline void QTimerMessageBox::setTimeout(int timeout) {
 }
 
 int QTimerMessageBox::exec(int timeout) {
-	if (defaultButton()) {
+	if (defaultButton() && timeout > 0) {
 		setTimeout(timeout);
 		m_DefaultButtonText = defaultButton()->text();
 		

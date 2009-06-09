@@ -8,14 +8,16 @@
 #ifndef QBAT_COMMON_H
 #define QBAT_COMMON_H
 
-#include <string>
+// #include <string>
+#include <QString>
 #include <QColor>
 #include "constants.h"
+
+#define BUF_SIZE 256
 
 namespace qbat {
 	struct Settings {
 		quint16 pollingRate;
-		bool mergeBatterys;
 		bool handleCritical;
 		quint8 criticalCapacity;
 		bool executeCommand;
@@ -34,9 +36,11 @@ namespace qbat {
 		QRgb poleFullColor;*/
 	};
 	
-	std::string readStringSysFile(const char * fileName);
+	QString readStringSysFile(const char * fileName);
+	bool readStringFromFile(char * buffer, const char * fileName);
 	int readIntSysFile(const char * fileName);
-	int toStatusInt(std::string status);
+	int toStatusInt(QString status);
+	int toStatusInt(const char * status);
 }
 
 #endif

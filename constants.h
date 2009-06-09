@@ -1,7 +1,7 @@
 #ifndef QBAT_CONSTANTS_H
 #define QBAT_CONSTANTS_H
 
-#define UI_VERSION                      "0.1.8"
+#define UI_VERSION                      "0.1.98 (0.2.0 alpha 1)"
 #define UI_NAME                         tr("QBat - Qt Battery Monitor")
 
 #define UI_DIR_WORK                     ".qbat/"
@@ -19,7 +19,8 @@
 #define UI_CAPTION_FULL(a)              a + "_full"
 #define UI_CAPTION_DESIGN(a)            UI_CAPTION_FULL(a) + "_design"
 
-#define UI_ICON_QBAT                    UI_PATH_ICONS "qbat.svg"
+#define UI_ICON_QBAT_LARGE              UI_PATH_ICONS "qbat2_large.svg"
+#define UI_ICON_QBAT_SMALL              UI_PATH_ICONS "qbat2.svg"
 
 #define UI_BATTERY_CHARGING             1
 #define UI_BATTERY_DISCHARGING          2
