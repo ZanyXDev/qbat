@@ -8,7 +8,6 @@
 #ifndef QBAT_COMMON_H
 #define QBAT_COMMON_H
 
-// #include <string>
 #include <QString>
 #include <QColor>
 #include "constants.h"
@@ -28,19 +27,10 @@ namespace qbat {
 		QRgb colors[UI_COUNT_COLORS];
 		bool showBalloon;
 		bool mergeBatteries;
-/*		QRgb textColor;
-		QRgb mainEmptyColor;
-		QRgb mainChargedColor;
-		QRgb poleColor;
-		QRgb textFullColor;
-		QRgb mainFullColor;
-		QRgb poleFullColor;*/
 	};
 	
-	QString readStringSysFile(const char * fileName);
 	bool readStringFromFile(char * buffer, const char * fileName);
 	int readIntSysFile(const char * fileName);
-	int toStatusInt(QString status);
 	int toStatusInt(const char * status);
 	
 	inline qint8 calcRelativeDef(int value, int border, qint8 defValue = -1) {

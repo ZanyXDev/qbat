@@ -9,7 +9,6 @@
 #define QBAT_POWERMANAGER_H
 
 #include <QHash>
-#include <QDir>
 #include <QMenu>
 #include <QSettings>
 #include <QSystemTrayIcon>
@@ -26,7 +25,6 @@ namespace qbat {
 		
 		bool m_ACPlug;
 		bool m_CriticalHandled;
-// 		QDir m_SysfsDir;
 		
 		Settings m_Settings;
 		QSettings m_SettingsFile;
@@ -44,14 +42,11 @@ namespace qbat {
 		CPowerManager(QObject * parent = 0);
 		~CPowerManager();
 	private:
-/*		void updateMerged(QStringList & powerSupplies, bool & acPlug, int & relativeCapacity);
-		void updateSeparated(QStringList & powerSupplies, bool & acPlug, int & relativeCapacity);*/
 		void updateSupplies();
 		void updateMergedData();
 		void checkCritical();
 	private slots:
 		void updateBatteryData();
-// 		void updateData();
 		void restartTimer();
 	public slots:
 		void showSettings();

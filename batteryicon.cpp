@@ -16,24 +16,8 @@ namespace qbat {
 		QSystemTrayIcon(parent),
 		m_Icon(28, 28),
 		m_Settings(settings)
-		
-// 		m_RelativeCharge(-1),
-// 		
-// 		m_FullCapacity(0),
-// 		m_DesignCapacity(0),
-// 		m_CurrentCapacity(0),
-// 		m_Rate(0),
-// 		m_Voltage(0),
-// 		m_Status(0),
-// 		
-// 		m_EnergyUnits(false)
 	{
 		m_Data.name = batteryName;
-// 		m_Icon.fill(Qt::transparent);
-// 		setIcon(m_Icon);
-// 		setIcon(QIcon(UI_ICON_QBAT_SMALL));
-// 		setContextMenu(contextMenu);
-// 		show();
 	}
 	
 	CBatteryIcon::~CBatteryIcon() {
