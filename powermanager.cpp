@@ -192,18 +192,48 @@ namespace qbat {
 	void CPowerManager::updateMergedData() {
 		if (!m_BatteryIcons.isEmpty()) {
 			int fullCount = 0;
+			int rateCount = 0;
+			int voltageCount = 0;
 			
 			int fullCapacity    = 0;
 			int currentCapacity = 0;
+			int rate            = 0;
+			int voltage         = 0;
 			int status          = 0;
 			
 			foreach (CBatteryIcon * battery, m_BatteryIcons) {
-				if (battery->data().fullCapacity) {
-					fullCapacity += battery->data().fullCapacity;
-					fullCount++;
+				if (battery->data().voltage) {
+					voltage += battery->data().voltage;
+					voltageCount++;
 				}
 				
-				currentCapacity += battery->data().currentCapacity;
+				if (!battery->data().energyUnits) {
+					currentCapacity += battery->data().currentCapacity;
+					
+					if (battery->data().fullCapacity) {
+						fullCapacity += battery->data().fullCapacity;
+						fullCount++;
+					}
+					
+					if (battery->data().rate) {
+						rate += battery->data().rate;
+						rateCount++;
+					}
+				}
+				else if (battery->data().voltage) {
+					double voltageNorm  = battery->data().voltage / 100.0;
+					currentCapacity += qRound(battery->data().currentCapacity / voltageNorm);
+					
+					if (battery->data().fullCapacity) {
+						fullCapacity += qRound(battery->data().fullCapacity / voltageNorm);
+						fullCount++;
+					}
+					
+					if (battery->data().rate) {
+						rate += qRound(battery->data().rate / voltageNorm);
+						rateCount++;
+					}
+				}
 				
 				if ((!status) || (battery->data().status != UI_BATTERY_FULL))
 					status = battery->data().status;
@@ -212,9 +242,15 @@ namespace qbat {
 			if (fullCount)
 				fullCapacity /= fullCount;
 			
+			if (rateCount)
+				rate /= rateCount;
+			
+			if (voltageCount)
+				voltage /= voltageCount;
+			
 			currentCapacity /= m_BatteryIcons.count();
 			
-			m_DefaultIcon->updateData(currentCapacity, fullCapacity, 0, 0, 0, status, false);
+			m_DefaultIcon->updateData(currentCapacity, fullCapacity, 0, rate, voltage, status, false);
 		}
 	}
 	

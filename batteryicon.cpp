@@ -105,8 +105,12 @@ namespace qbat {
 		if (m_Data.energyUnits) {
 			if ((m_Data.rate) && (m_Data.status != UI_BATTERY_FULL)) {
 				double rateW = qRound(m_Data.rate / 100000.0) / 10.0;
-				double rateA = qRound((m_Data.rate / m_Data.voltage) / 1000.0) / 10.0;
-				newToolTip += tr("current rate: %1W / %2A").arg(rateW).arg(rateA) + '\n';
+				if (m_Data.voltage) {
+					double rateA = qRound((m_Data.rate / m_Data.voltage) / 1000.0) / 10.0;
+					newToolTip += tr("current rate: %1W / %2A").arg(rateW).arg(rateA) + '\n';
+				}
+				else
+					newToolTip += tr("current rate: %1W").arg(rateW) + '\n';
 			}
 			
 			newToolTip += tr("current capacity: %1mWh").arg(m_Data.currentCapacity / 1000);
@@ -121,8 +125,12 @@ namespace qbat {
 		{
 			if ((m_Data.rate) && (m_Data.status != UI_BATTERY_FULL)) {
 				double rateA = m_Data.rate / 100000.0;
-				double rateW = qRound(rateA * m_Data.voltage / 100.0) / 10.0;
-				newToolTip += tr("current rate: %1W / %2A").arg(rateW).arg(qRound(rateA) / 10.0) + '\n';
+				if (m_Data.voltage) {
+					double rateW = qRound(rateA * m_Data.voltage / 100.0) / 10.0;
+					newToolTip += tr("current rate: %1W / %2A").arg(rateW).arg(qRound(rateA) / 10.0) + '\n';
+				}
+				else
+					newToolTip += tr("current rate: %2A").arg(qRound(rateA) / 10.0) + '\n';
 			}
 			
 			newToolTip += tr("current capacity: %1mAh").arg(m_Data.currentCapacity / 1000);
