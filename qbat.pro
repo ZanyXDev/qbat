@@ -20,7 +20,7 @@ DESTDIR = .
 
 target.path = /usr/bin
 iconstarget.path = /usr/share/qbat/icons
-iconstarget.files = res/qbat*.svg
+iconstarget.files = res/qbat*.svg res/qbat.png
 langtarget.path = /usr/share/qbat/lang
 langtarget.files = qbat_*.qm
 shortcuttarget.path = /usr/share/applications
