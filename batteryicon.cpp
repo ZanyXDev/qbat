@@ -130,7 +130,7 @@ namespace qbat {
 					newToolTip += tr("current rate: %1W / %2A").arg(rateW).arg(qRound(rateA) / 10.0) + '\n';
 				}
 				else
-					newToolTip += tr("current rate: %2A").arg(qRound(rateA) / 10.0) + '\n';
+					newToolTip += tr("current rate: %1A").arg(qRound(rateA) / 10.0) + '\n';
 			}
 			
 			newToolTip += tr("current capacity: %1mAh").arg(m_Data.currentCapacity / 1000);

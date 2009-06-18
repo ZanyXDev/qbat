@@ -1,3 +1,15 @@
+qbat (0.2.0) unstable; urgency=low
+
+  * split timers (for lower CPU usage):
+    - check for power supplies
+    - retrieve power supply data
+  * new icons
+  * code cleanup
+  * internal redesign
+  * german translation
+
+ -- Oliver Groß <neokensuke@freenet.de>  Thu, 18 Jun 2009 13:08:41 +0200
+
 qbat (0.1.8) unstable; urgency=low
 
   * code cleanup

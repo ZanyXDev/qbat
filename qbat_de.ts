@@ -51,38 +51,49 @@
         <translation>unbekannt</translation>
     </message>
     <message>
-        <location filename="batteryicon.cpp" line="109"/>
-        <location filename="batteryicon.cpp" line="125"/>
+        <location filename="batteryicon.cpp" line="110"/>
+        <location filename="batteryicon.cpp" line="130"/>
         <source>current rate: %1W / %2A</source>
         <translation>Aktuelle Rate: %1W / %2A</translation>
     </message>
     <message>
-        <location filename="batteryicon.cpp" line="112"/>
+        <location filename="batteryicon.cpp" line="113"/>
+        <source>current rate: %1W</source>
+        <translation>Aktuelle Rate: %1W</translation>
+    </message>
+    <message>
+        <location filename="batteryicon.cpp" line="116"/>
         <source>current capacity: %1mWh</source>
         <translation>aktuelle Kapazität: %1mWh</translation>
     </message>
     <message>
-        <location filename="batteryicon.cpp" line="115"/>
+        <location filename="batteryicon.cpp" line="119"/>
         <source>last full capacity: %1mWh</source>
         <translation>volle Kapazität: %1mWh</translation>
     </message>
     <message>
-        <location filename="batteryicon.cpp" line="118"/>
+        <location filename="batteryicon.cpp" line="122"/>
         <source>design capacity: %1mWh</source>
         <translation>Designkapazität: %1mWh</translation>
     </message>
     <message>
-        <location filename="batteryicon.cpp" line="128"/>
+        <location filename="batteryicon.cpp" line="133"/>
+        <source>current rate: %1A</source>
+        <oldsource>current rate: %2A</oldsource>
+        <translation>Aktuelle Rate: %1A</translation>
+    </message>
+    <message>
+        <location filename="batteryicon.cpp" line="136"/>
         <source>current capacity: %1mAh</source>
         <translation>aktuelle Kapazität: %1mAh</translation>
     </message>
     <message>
-        <location filename="batteryicon.cpp" line="131"/>
+        <location filename="batteryicon.cpp" line="139"/>
         <source>last full capacity: %1mAh</source>
         <translation>volle Kapazität: %1mAh</translation>
     </message>
     <message>
-        <location filename="batteryicon.cpp" line="134"/>
+        <location filename="batteryicon.cpp" line="142"/>
         <source>design capacity: %1mAh</source>
         <translation>Designkapazität: %1mAh</translation>
     </message>
@@ -125,17 +136,17 @@
         <translation>Keine Informationen verfügbar</translation>
     </message>
     <message>
-        <location filename="powermanager.cpp" line="228"/>
+        <location filename="powermanager.cpp" line="264"/>
         <source>QBat - critical battery capacity (will automatically choose ok on timeout)</source>
         <translation>QBat - Kritischer Ladestand (automatische Wahl von OK bei Ablauf der Zeit)</translation>
     </message>
     <message>
-        <location filename="powermanager.cpp" line="229"/>
+        <location filename="powermanager.cpp" line="265"/>
         <source>QBat - critical battery capacity</source>
         <translation>QBat - Kritischer Ladestand</translation>
     </message>
     <message>
-        <location filename="powermanager.cpp" line="231"/>
+        <location filename="powermanager.cpp" line="267"/>
         <source>WARNING: The attached battery(s) reached the critical mark.
 Click cancel and please make sure to save and shut down soon or provide another source of power
 or:
@@ -149,16 +160,16 @@ Wenn Sie auf Abbrechen klicken sollten Sie den PC an eine Stromquelle anschließ
 ihre Arbeit möglichst bald speichern und den PC herunterfahren.</translation>
     </message>
     <message>
-        <location filename="powermanager.cpp" line="235"/>
+        <location filename="powermanager.cpp" line="271"/>
         <source>WARNING: The attached battery(s) reached the critical mark.
 Please make sure to save and shut down soon or provide another source of power.</source>
         <translation>WARNUNG: Die angeschlossenen Batterien haben den Kritischen Ladestand erreicht.
 Sie sollten den PC an eine Stromquelle anschließen oder ihre Arbeit möglichst bald speichern und den PC herunterfahren.</translation>
     </message>
     <message>
-        <location filename="powermanager.cpp" line="283"/>
-        <location filename="powermanager.cpp" line="286"/>
-        <location filename="powermanager.cpp" line="294"/>
+        <location filename="powermanager.cpp" line="319"/>
+        <location filename="powermanager.cpp" line="322"/>
+        <location filename="powermanager.cpp" line="330"/>
         <source>About QBat</source>
         <translation>Über QBat</translation>
     </message>
