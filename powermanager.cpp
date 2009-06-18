@@ -19,11 +19,10 @@ namespace qbat {
 		QObject(parent),
 		m_Timer(-1),
 		m_DataTimer(-1),
-		m_RelativeCapacity(100),
+// 		m_RelativeCapacity(100),
 		m_ACPlug(false),
 		m_CriticalHandled(false),
-		m_SettingsFile(UI_FILE_CONFIG, QSettings::IniFormat, this),
-		m_DefaultTrayIcon(QIcon(UI_ICON_QBAT_SMALL), this)
+		m_SettingsFile(UI_FILE_CONFIG, QSettings::IniFormat, this)
 	{
 		readSettings();
 		m_ContextMenu.addAction(tr("&Settings"), this, SLOT(showSettings()))->setEnabled(CBatteryIcon::sysfsDir.exists());
@@ -31,7 +30,8 @@ namespace qbat {
 		m_ContextMenu.addSeparator();
 		m_ContextMenu.addAction(tr("&Quit"), qApp, SLOT(quit()));
 		
-		m_DefaultTrayIcon.setContextMenu(&m_ContextMenu);
+		m_DefaultIcon = new CBatteryIcon(&m_Settings, tr("merged"), this);
+		m_DefaultIcon->setContextMenu(&m_ContextMenu);
 		
 		if (CBatteryIcon::sysfsDir.exists()) {
 			m_DataTimer = startTimer(15000);
@@ -53,6 +53,7 @@ namespace qbat {
 		m_SettingsFile.endGroup();
 		
 		m_SettingsFile.beginGroup("TrayIcons");
+		m_Settings.mergeBatteries = m_SettingsFile.value("mergeBatteries", false).toBool();
 		m_Settings.colors[UI_COLOR_PEN] = m_SettingsFile.value("textColor", 0).toUInt();
 		m_Settings.colors[UI_COLOR_PEN_FULL] = m_SettingsFile.value("textFullColor", 0).toUInt();
 		m_Settings.colors[UI_COLOR_BRUSH_CHARGED] = m_SettingsFile.value("mainChargedColor", qRgb( 0, 255, 0)).toUInt();
@@ -80,6 +81,7 @@ namespace qbat {
 		m_SettingsFile.endGroup();
 		
 		m_SettingsFile.beginGroup("TrayIcons");
+		m_SettingsFile.setValue("mergeBatteries", m_Settings.mergeBatteries);
 		m_SettingsFile.setValue("textColor", m_Settings.colors[UI_COLOR_PEN]);
 		m_SettingsFile.setValue("textFullColor", m_Settings.colors[UI_COLOR_PEN_FULL]);
 		m_SettingsFile.setValue("mainChargedColor", m_Settings.colors[UI_COLOR_BRUSH_CHARGED]);
@@ -130,9 +132,16 @@ namespace qbat {
 						currentBatteryIcon = m_BatteryIcons.take(i);
 					}
 					else {
-						currentBatteryIcon = new CBatteryIcon(i, &m_Settings, &m_ContextMenu, this);
+// 						qDebug("new battery: %s", i.toAscii().constData());
+						currentBatteryIcon = new CBatteryIcon(&m_Settings, i, this);
+						currentBatteryIcon->setContextMenu(&m_ContextMenu);
 						currentBatteryIcon->updateData();
 						currentBatteryIcon->updateIcon();
+						currentBatteryIcon->updateToolTip();
+						
+						if (!m_Settings.mergeBatteries)
+							currentBatteryIcon->show();
+						
 						m_CriticalHandled = false;
 					}
 					newBatteryIcons << currentBatteryIcon;
@@ -145,43 +154,74 @@ namespace qbat {
 			m_BatteryIcons.clear();
 			
 			foreach(CBatteryIcon * i, newBatteryIcons)
-				m_BatteryIcons.insert(i->batteryName(), i);
-			
-			
-			m_DefaultTrayIcon.setVisible(m_BatteryIcons.isEmpty());
-			
-			if (m_ACPlug)
-				m_DefaultTrayIcon.setToolTip("QBat - " + tr("AC adapter plugged in"));
-			else
-				m_DefaultTrayIcon.setToolTip("QBat - " + tr("AC adapter unplugged"));
+				m_BatteryIcons.insert(i->data().name, i);
 			
 			if (oldAC != m_ACPlug)
 				updateBatteryData();
 			else
 				updateMergedData();
 			
+			if (m_BatteryIcons.isEmpty()) {
+				if (!m_DefaultIcon->isVisible()) {
+					m_DefaultIcon->setVisible(true);
+					m_DefaultIcon->setIcon(QIcon(UI_ICON_QBAT_SMALL));
+					
+					if (m_ACPlug)
+						m_DefaultIcon->setToolTip("QBat - " + tr("AC adapter plugged in"));
+					else
+						m_DefaultIcon->setToolTip("QBat - " + tr("AC adapter unplugged"));
+				}
+			}
+			else {
+				if (!m_DefaultIcon->isVisible()) {
+					m_DefaultIcon->updateData();
+					m_DefaultIcon->updateIcon();
+				}
+				m_DefaultIcon->setVisible(m_Settings.mergeBatteries);
+			}
+			
 			checkCritical();
 		}
 		else {
-			m_DefaultTrayIcon.setToolTip("QBat - " + tr("no information available"));
-			m_DefaultTrayIcon.setVisible(true);
+			m_DefaultIcon->setToolTip("QBat - " + tr("no information available"));
+			m_DefaultIcon->setVisible(true);
 		}
 		
 	}
 	
 	void CPowerManager::updateMergedData() {
-		m_RelativeCapacity = 0;
-		foreach (CBatteryIcon * battery, m_BatteryIcons) {
-			if (battery->relativeCharge() != -1)
-				m_RelativeCapacity += battery->relativeCharge();
+		if (!m_BatteryIcons.isEmpty()) {
+			int fullCount = 0;
+			
+			int fullCapacity    = 0;
+			int currentCapacity = 0;
+			int status          = 0;
+			
+			foreach (CBatteryIcon * battery, m_BatteryIcons) {
+				if (battery->data().fullCapacity) {
+					fullCapacity += battery->data().fullCapacity;
+					fullCount++;
+				}
+				
+				currentCapacity += battery->data().currentCapacity;
+				
+				if ((!status) || (battery->data().status != UI_BATTERY_FULL))
+					status = battery->data().status;
+			}
+			
+			if (fullCount)
+				fullCapacity /= fullCount;
+			
+			currentCapacity /= m_BatteryIcons.count();
+			
+			m_DefaultIcon->updateData(currentCapacity, fullCapacity, 0, 0, 0, status, false);
 		}
-		
-		if (!m_RelativeCapacity)
-			m_RelativeCapacity = -1;
 	}
 	
 	void CPowerManager::checkCritical() {
-		if (m_ACPlug || m_CriticalHandled || m_RelativeCapacity == -1 || !m_Settings.handleCritical || m_RelativeCapacity > m_Settings.criticalCapacity)
+		if (m_ACPlug || m_CriticalHandled ||
+			m_DefaultIcon->data().relativeCharge == -1 || !m_Settings.handleCritical ||
+			m_DefaultIcon->data().relativeCharge > m_Settings.criticalCapacity)
 			return;
 		
 		QString msgTitle = (m_Settings.executeCommand && m_Settings.confirmWithTimeout) ?
@@ -230,6 +270,7 @@ namespace qbat {
 			}
 			
 			m_BatteryIcons.clear();
+			m_DefaultIcon->updateData(0, 0, 0, 0, 0, 0, false);
 			
 			updateSupplies();
 			restartTimer();
@@ -238,8 +279,8 @@ namespace qbat {
 	
 	void CPowerManager::showAbout() {
 		if (m_Settings.showBalloon) {
-			if (m_DefaultTrayIcon.isVisible())
-				m_DefaultTrayIcon.showMessage(tr("About QBat"), UI_NAME + "\nv" + QString(UI_VERSION),
+			if (m_DefaultIcon->isVisible())
+				m_DefaultIcon->showMessage(tr("About QBat"), UI_NAME + "\nv" + QString(UI_VERSION),
 					QSystemTrayIcon::Information, 4000);
 			else
 				m_BatteryIcons.begin().value()->showMessage(tr("About QBat"), UI_NAME + "\nv" + QString(UI_VERSION),

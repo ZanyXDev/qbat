@@ -12,27 +12,28 @@
 namespace qbat {
 	QDir CBatteryIcon::sysfsDir(UI_PATH_SYSFS_DIR);
 	
-	CBatteryIcon::CBatteryIcon(QString batteryName, Settings * settings, QMenu * contextMenu, QObject * parent) :
+	CBatteryIcon::CBatteryIcon(Settings * settings, QString batteryName, QObject * parent) :
 		QSystemTrayIcon(parent),
-		m_BatteryName(batteryName),
 		m_Icon(28, 28),
-		m_Settings(settings),
+		m_Settings(settings)
 		
-		m_RelativeCharge(-1),
-		
-		m_FullCapacity(0),
-		m_DesignCapacity(0),
-		m_CurrentCapacity(0),
-		m_Rate(0),
-		m_Voltage(0),
-		m_Status(0),
-		
-		m_EnergyUnits(false)
+// 		m_RelativeCharge(-1),
+// 		
+// 		m_FullCapacity(0),
+// 		m_DesignCapacity(0),
+// 		m_CurrentCapacity(0),
+// 		m_Rate(0),
+// 		m_Voltage(0),
+// 		m_Status(0),
+// 		
+// 		m_EnergyUnits(false)
 	{
-		m_Icon.fill(Qt::transparent);
-		setIcon(m_Icon);
-		setContextMenu(contextMenu);
-		show();
+		m_Data.name = batteryName;
+// 		m_Icon.fill(Qt::transparent);
+// 		setIcon(m_Icon);
+// 		setIcon(QIcon(UI_ICON_QBAT_SMALL));
+// 		setContextMenu(contextMenu);
+// 		show();
 	}
 	
 	CBatteryIcon::~CBatteryIcon() {
@@ -42,12 +43,12 @@ namespace qbat {
 		m_Icon.fill(Qt::transparent);
 		QPainter painter(&m_Icon);
 		
-		if (m_CurrentCapacity != m_FullCapacity) {
+		if (m_Data.currentCapacity != m_Data.fullCapacity) {
 			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN]));
 			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_EMPTY]));
 			painter.drawRect(0, 4, 27, 23);
 			
-			int chargedPixels = (int)(22 * m_RelativeCharge / 100.0);
+			int chargedPixels = (int)(22 * m_Data.relativeCharge / 100.0);
 			
 			painter.fillRect(1, 5 + 22 - chargedPixels, 26, chargedPixels, QColor(m_Settings->colors[UI_COLOR_BRUSH_CHARGED]));
 			
@@ -64,35 +65,35 @@ namespace qbat {
 		
 		painter.setBrush(Qt::NoBrush);
 		
-		if (m_RelativeCharge < 100)
+		if (m_Data.relativeCharge < 100)
 			((QFont&)painter.font()).setPixelSize(15);
 		else
 			((QFont&)painter.font()).setPixelSize(12);
 		
 		painter.setRenderHint(QPainter::TextAntialiasing);
 		((QFont&)painter.font()).setBold(true);
-		if (m_RelativeCharge == -1)
+		if (m_Data.relativeCharge == -1)
 			painter.drawText(1, 9, 26, 16, Qt::AlignHCenter, QString('?'));
 		else
-			painter.drawText(1, 9, 26, 16, Qt::AlignHCenter, QString::number(m_RelativeCharge));
+			painter.drawText(1, 9, 26, 16, Qt::AlignHCenter, QString::number(m_Data.relativeCharge));
 		
 		setIcon(m_Icon);
 	}
 	
 	void CBatteryIcon::updateToolTip() {
-		QString newToolTip = tr("QBat - %1: %2%").arg(m_BatteryName) +'\n';
+		QString newToolTip = tr("QBat - %1: %2%").arg(m_Data.name) +'\n';
 		
-		if (m_RelativeCharge == -1)
+		if (m_Data.relativeCharge == -1)
 			newToolTip = newToolTip.arg('-');
 		else
-			newToolTip = newToolTip.arg(m_RelativeCharge);
+			newToolTip = newToolTip.arg(m_Data.relativeCharge);
 		
-		switch (m_Status) {
+		switch (m_Data.status) {
 		case UI_BATTERY_DISCHARGING:
 			newToolTip += tr("status: %1").arg(tr("dischaging"));
-			if (m_Rate) {
+			if (m_Data.rate) {
 				newToolTip += '\n';
-				qreal remainingTime  = (qreal)m_CurrentCapacity / m_Rate;
+				qreal remainingTime  = (qreal)(m_Data.currentCapacity) / m_Data.rate;
 				int remainingHours   = (int)remainingTime;
 				int remainungMinutes = (int)(remainingTime * 60) % 60;
 				newToolTip += tr("remaining time: %1:%2").arg(remainingHours, 2, 10, QChar('0')).arg(remainungMinutes, 2, 10, QChar('0'));
@@ -100,9 +101,9 @@ namespace qbat {
 			break;
 		case UI_BATTERY_CHARGING:
 			newToolTip += tr("status: %1").arg(tr("charging"));
-			if (m_Rate && m_FullCapacity) {
+			if (m_Data.rate && m_Data.fullCapacity) {
 				newToolTip += '\n';
-				qreal remainingTime  = (qreal)(m_FullCapacity - m_CurrentCapacity) / m_Rate;
+				qreal remainingTime  = (qreal)(m_Data.fullCapacity - m_Data.currentCapacity) / m_Data.rate;
 				int remainingHours   = (int)remainingTime;
 				int remainungMinutes = (int)(remainingTime * 60) % 60;
 				newToolTip += tr("remaining time: %1:%2").arg(remainingHours, 2, 10, QChar('0')).arg(remainungMinutes, 2, 10, QChar('0'));
@@ -117,116 +118,118 @@ namespace qbat {
 		}
 		newToolTip += '\n';
 		
-		if (m_EnergyUnits) {
-			if ((m_Rate) && (m_Status != UI_BATTERY_FULL)) {
-				double rateW = qRound(m_Rate / 100000.0) / 10.0;
-				double rateA = qRound((m_Rate / m_Voltage) / 1000.0) / 10.0;
+		if (m_Data.energyUnits) {
+			if ((m_Data.rate) && (m_Data.status != UI_BATTERY_FULL)) {
+				double rateW = qRound(m_Data.rate / 100000.0) / 10.0;
+				double rateA = qRound((m_Data.rate / m_Data.voltage) / 1000.0) / 10.0;
 				newToolTip += tr("current rate: %1W / %2A").arg(rateW).arg(rateA) + '\n';
 			}
 			
-			newToolTip += tr("current capacity: %1mWh").arg(m_CurrentCapacity / 1000);
+			newToolTip += tr("current capacity: %1mWh").arg(m_Data.currentCapacity / 1000);
 			
-			if (m_FullCapacity)
-				newToolTip += '\n' + tr("last full capacity: %1mWh").arg(m_FullCapacity / 1000);
+			if (m_Data.fullCapacity)
+				newToolTip += '\n' + tr("last full capacity: %1mWh").arg(m_Data.fullCapacity / 1000);
 			
-			if (m_DesignCapacity)
-				newToolTip += '\n' + tr("design capacity: %1mWh").arg(m_DesignCapacity / 1000);
+			if (m_Data.designCapacity)
+				newToolTip += '\n' + tr("design capacity: %1mWh").arg(m_Data.designCapacity / 1000);
 		}
 		else
 		{
-			if ((m_Rate) && (m_Status != UI_BATTERY_FULL)) {
-				double rateA = m_Rate / 100000.0;
-				double rateW = qRound(rateA * m_Voltage / 100.0) / 10.0;
+			if ((m_Data.rate) && (m_Data.status != UI_BATTERY_FULL)) {
+				double rateA = m_Data.rate / 100000.0;
+				double rateW = qRound(rateA * m_Data.voltage / 100.0) / 10.0;
 				newToolTip += tr("current rate: %1W / %2A").arg(rateW).arg(qRound(rateA) / 10.0) + '\n';
 			}
 			
-			newToolTip += tr("current capacity: %1mAh").arg(m_CurrentCapacity / 1000);
+			newToolTip += tr("current capacity: %1mAh").arg(m_Data.currentCapacity / 1000);
 			
-			if (m_FullCapacity)
-				newToolTip += '\n' + tr("last full capacity: %1mAh").arg(m_FullCapacity / 1000);
+			if (m_Data.fullCapacity)
+				newToolTip += '\n' + tr("last full capacity: %1mAh").arg(m_Data.fullCapacity / 1000);
 			
-			if (m_DesignCapacity)
-				newToolTip += '\n' + tr("design capacity: %1mAh").arg(m_DesignCapacity / 1000);
+			if (m_Data.designCapacity)
+				newToolTip += '\n' + tr("design capacity: %1mAh").arg(m_Data.designCapacity / 1000);
 		}
 		setToolTip(newToolTip);
 	}
 	
-	void CBatteryIcon::updateData() {
-		int intBuffer;
+	void CBatteryIcon::updateData(int currentCapacity, int fullCapacity, int designCapacity, int rate, int voltage, int status, bool energyUnits) {
+		m_Data.energyUnits = energyUnits;
+		
 		bool noupdate = true;
 		
-		m_EnergyUnits = sysfsDir.exists(m_BatteryName + UI_CAPTION_NOW(UI_CAPTION_ENERGY));
-		
-		intBuffer = readIntSysFile(sysfsDir.filePath(m_BatteryName + "/current_now").toAscii().constData());
-		if (intBuffer != m_Rate) {
+		if (rate != m_Data.rate) {
 			noupdate = false;
-			m_Rate = intBuffer;
+			m_Data.rate = rate;
 		}
 		
-		intBuffer = readIntSysFile(sysfsDir.filePath(m_BatteryName + UI_CAPTION_NOW(UI_CAPTION_VOLTAGE)).toAscii().constData()) / 10000;
-		if (intBuffer != m_Voltage) {
+		if (voltage != m_Data.voltage) {
 			noupdate = false;
-			m_Voltage = intBuffer;
+			m_Data.voltage = voltage;
 		}
 		
-		{
-			char buffer[BUF_SIZE];
-			readStringFromFile(buffer, sysfsDir.filePath(m_BatteryName + "/status").toAscii().constData());
-			intBuffer = toStatusInt(buffer);
-			
-			if (intBuffer != m_Status) {
-				noupdate = false;
-				m_Status = intBuffer;
-			}
+		if (status != m_Data.status) {
+			noupdate = false;
+			m_Data.status = status;
 		}
 		
-		{
-			int intBuffer[3];
-			if (m_EnergyUnits) {
-				intBuffer[0] = readIntSysFile(sysfsDir.filePath(m_BatteryName + UI_CAPTION_FULL(UI_CAPTION_ENERGY)).toAscii().constData());
-				intBuffer[1] = readIntSysFile(sysfsDir.filePath(m_BatteryName + UI_CAPTION_DESIGN(UI_CAPTION_ENERGY)).toAscii().constData());
-				intBuffer[2] = readIntSysFile(sysfsDir.filePath(m_BatteryName + UI_CAPTION_NOW(UI_CAPTION_ENERGY)).toAscii().constData());
-			}
-			else {
-				intBuffer[0] = readIntSysFile(sysfsDir.filePath(m_BatteryName + UI_CAPTION_FULL(UI_CAPTION_CHARGE)).toAscii().constData());
-				intBuffer[1] = readIntSysFile(sysfsDir.filePath(m_BatteryName + UI_CAPTION_DESIGN(UI_CAPTION_CHARGE)).toAscii().constData());
-				intBuffer[2] = readIntSysFile(sysfsDir.filePath(m_BatteryName + UI_CAPTION_NOW(UI_CAPTION_CHARGE)).toAscii().constData());
-			}
-			
-			if (intBuffer[0] != m_FullCapacity) {
-				noupdate = false;
-				m_FullCapacity = intBuffer[0];
-			}
-			
-			if (intBuffer[1] != m_DesignCapacity) {
-				noupdate = false;
-				m_DesignCapacity = intBuffer[1];
-			}
-			
-			if (intBuffer[2] != m_CurrentCapacity) {
-				noupdate = false;
-				m_CurrentCapacity = intBuffer[2];
-			}
+		if (fullCapacity != m_Data.fullCapacity) {
+			noupdate = false;
+			m_Data.fullCapacity = fullCapacity;
+		}
+		
+		if (designCapacity != m_Data.designCapacity) {
+			noupdate = false;
+			m_Data.designCapacity = designCapacity;
+		}
+		
+		if (currentCapacity != m_Data.currentCapacity) {
+			noupdate = false;
+			m_Data.currentCapacity = currentCapacity;
 		}
 		
 		if (noupdate)
 			return;
 		
-		qint8 newRelativeCharge;
+		qint8 newRelativeCharge = calcRelativeDef(currentCapacity, fullCapacity);
 		
-		if (m_FullCapacity)
-			newRelativeCharge = (qint8)(100.0 * m_CurrentCapacity / m_FullCapacity);
-		else
-			newRelativeCharge = -1;
-		
-		
-		if (newRelativeCharge != m_RelativeCharge) {
-			m_RelativeCharge = newRelativeCharge;
+		if (newRelativeCharge != m_Data.relativeCharge) {
+			m_Data.relativeCharge = newRelativeCharge;
 			
 			if (isVisible())
 				updateIcon();
 		}
 		
-		updateToolTip();
+		if (isVisible())
+			updateToolTip();
+	}
+	
+	void CBatteryIcon::updateData() {
+		int currentCapacity = 0;
+		int fullCapacity = 0;
+		int designCapacity = 0;
+		int rate = 0;
+		int voltage = 0;
+		int status = 0;
+		bool energyUnits = sysfsDir.exists(m_Data.name + UI_CAPTION_NOW(UI_CAPTION_ENERGY));
+		
+		rate = readIntSysFile(sysfsDir.filePath(m_Data.name + "/current_now").toAscii().constData());
+		voltage = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_NOW(UI_CAPTION_VOLTAGE)).toAscii().constData()) / 10000;
+		
+		char buffer[BUF_SIZE];
+		readStringFromFile(buffer, sysfsDir.filePath(m_Data.name + "/status").toAscii().constData());
+		status = toStatusInt(buffer);
+		
+		if (energyUnits) {
+			fullCapacity    = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_FULL(UI_CAPTION_ENERGY)).toAscii().constData());
+			designCapacity  = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_DESIGN(UI_CAPTION_ENERGY)).toAscii().constData());
+			currentCapacity = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_NOW(UI_CAPTION_ENERGY)).toAscii().constData());
+		}
+		else {
+			fullCapacity    = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_FULL(UI_CAPTION_CHARGE)).toAscii().constData());
+			designCapacity  = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_DESIGN(UI_CAPTION_CHARGE)).toAscii().constData());
+			currentCapacity = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_NOW(UI_CAPTION_CHARGE)).toAscii().constData());
+		}
+		
+		updateData(currentCapacity, fullCapacity, designCapacity, rate, voltage, status, energyUnits);
 	}
 }

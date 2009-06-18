@@ -24,8 +24,6 @@ namespace qbat {
 		int m_Timer;
 		int m_DataTimer;
 		
-		int m_RelativeCapacity;
-		
 		bool m_ACPlug;
 		bool m_CriticalHandled;
 // 		QDir m_SysfsDir;
@@ -36,7 +34,7 @@ namespace qbat {
 		QMenu m_ContextMenu;
 		
 		QHash<QString, CBatteryIcon *> m_BatteryIcons;
-		QSystemTrayIcon m_DefaultTrayIcon;
+		CBatteryIcon * m_DefaultIcon;
 		
 		inline void readSettings();
 		inline void writeSettings();

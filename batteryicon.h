@@ -14,6 +14,29 @@
 namespace qbat {
 	struct Settings;
 	
+	struct BatteryData {
+		QString name;
+		int fullCapacity;
+		int designCapacity;
+		int currentCapacity;
+		int rate;
+		int voltage;
+		int status;
+		bool energyUnits;
+		qint8 relativeCharge;
+		
+		BatteryData() :
+			fullCapacity(0),
+			designCapacity(0),
+			currentCapacity(0),
+			rate(0),
+			voltage(0),
+			status(0),
+			energyUnits(false),
+			relativeCharge(-1)
+		{}
+	};
+	
 	class CBatteryIcon : public QSystemTrayIcon {
 		Q_OBJECT
 	private:
@@ -21,30 +44,20 @@ namespace qbat {
 		QPixmap m_Icon;
 		Settings * m_Settings;
 		
-		qint8 m_RelativeCharge;
+		BatteryData m_Data;
 		
-		int m_FullCapacity;
-		int m_DesignCapacity;
-		int m_CurrentCapacity;
-		int m_Rate;
-		int m_Voltage;
-		int m_Status;
-		
-		bool m_EnergyUnits;
-		
-// 		void updateIcon();
-		void updateToolTip();
 	public:
 		static QDir sysfsDir;
 		
-		CBatteryIcon(QString batteryName, Settings * settings, QMenu * contextMenu, QObject * parent = 0);
+		CBatteryIcon(Settings * settings, QString batteryName = QString(), QObject * parent = 0);
 		~CBatteryIcon();
 		
-		QString batteryName() const { return m_BatteryName; }
-		qint8 relativeCharge() const { return m_RelativeCharge; }
+		BatteryData data() const { return m_Data; }
 		
-// 		void updateMergedData();
+		void updateData(int currentCapacity, int fullCapacity, int designCapacity, int rate, int voltage, int status, bool energyUnits);
 		void updateData();
+		
+		void updateToolTip();
 		void updateIcon();
 	};
 }

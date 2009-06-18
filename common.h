@@ -27,6 +27,7 @@ namespace qbat {
 		quint16 timeoutValue;
 		QRgb colors[UI_COUNT_COLORS];
 		bool showBalloon;
+		bool mergeBatteries;
 /*		QRgb textColor;
 		QRgb mainEmptyColor;
 		QRgb mainChargedColor;
@@ -41,6 +42,10 @@ namespace qbat {
 	int readIntSysFile(const char * fileName);
 	int toStatusInt(QString status);
 	int toStatusInt(const char * status);
+	
+	inline qint8 calcRelativeDef(int value, int border, qint8 defValue = -1) {
+		return border ? (qint8)(100.0 * value / border) : defValue;
+	}
 }
 
 #endif

@@ -40,7 +40,7 @@ namespace qbat {
 		for (int i = 0; i < UI_COUNT_COLORS; i++)
 			m_Settings->colors[i] = colors[i];
 		
-// 		m_Settings->mergeBatteries = ui.mergeBatteryCheck->isChecked();
+		m_Settings->mergeBatteries = ui.mergeBatteriesCheck->isChecked();
 		
 		m_Settings->showBalloon = ui.showBalloonCheck->isChecked();
 		m_Settings->pollingRate = ui.pollingRateSpin->value();
@@ -69,7 +69,7 @@ namespace qbat {
 				colors[i] = settings->colors[i];
 			}
 		}
-// 		ui.mergeBatteryCheck->setChecked(settings->mergeBatteries);
+		ui.mergeBatteriesCheck->setChecked(settings->mergeBatteries);
 		
 		ui.pollingRateSpin->setValue(settings->pollingRate);
 		ui.showBalloonCheck->setChecked(settings->showBalloon);
