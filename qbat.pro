@@ -1,4 +1,3 @@
-
 TEMPLATE = app
 CONFIG += qt
 
@@ -9,11 +8,8 @@ OBJECTS_DIR = build/
 MOC_DIR = build/
 UI_DIR = ui/
 
+TRANSLATIONS = qbat_de.ts
 
-#FORMS =
-#TRANSLATIONS = qbat_de.ts
-
-#HEADERS += 
 SOURCES += main.cpp \
  batteryicon.cpp \
  powermanager.cpp \
@@ -41,5 +37,4 @@ powermanager.h \
 TARGET = qbat
 
 FORMS += settingsdialog.ui
-
 
