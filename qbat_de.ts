@@ -26,7 +26,7 @@
     </message>
     <message>
         <location filename="batteryicon.cpp" line="77"/>
-        <source>dischaging</source>
+        <source>discharging</source>
         <translation>entladen</translation>
     </message>
     <message>

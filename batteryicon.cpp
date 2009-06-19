@@ -74,7 +74,7 @@ namespace qbat {
 		
 		switch (m_Data.status) {
 		case UI_BATTERY_DISCHARGING:
-			newToolTip += tr("status: %1").arg(tr("dischaging"));
+			newToolTip += tr("status: %1").arg(tr("discharging"));
 			if (m_Data.rate) {
 				newToolTip += '\n';
 				qreal remainingTime  = (qreal)(m_Data.currentCapacity) / m_Data.rate;
