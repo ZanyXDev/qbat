@@ -39,18 +39,12 @@ namespace qbat {
 	
 	class CBatteryIcon : public QSystemTrayIcon {
 		Q_OBJECT
-	private:
-		QString m_BatteryName;
-		QPixmap m_Icon;
-		Settings * m_Settings;
-		
-		BatteryData m_Data;
-		
 	public:
 		static QDir sysfsDir;
 		
 		CBatteryIcon(Settings * settings, QString batteryName = QString(), QObject * parent = 0);
 		~CBatteryIcon();
+		
 		
 		BatteryData data() const { return m_Data; }
 		
@@ -59,6 +53,19 @@ namespace qbat {
 		
 		void updateToolTip();
 		void updateIcon();
+		
+		QString message() const { return m_Message; }
+		void setMessage(QString value);
+	private:
+		QString m_BatteryName;
+		QPixmap m_Icon;
+		Settings * m_Settings;
+		
+		QString m_Message;
+		
+		BatteryData m_Data;
+	private slots:
+		void handleClicks(QSystemTrayIcon::ActivationReason reason);
 	};
 }
 

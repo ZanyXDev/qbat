@@ -167,9 +167,9 @@ namespace qbat {
 					m_DefaultIcon->setIcon(QIcon(UI_ICON_QBAT_SMALL));
 					
 					if (m_ACPlug)
-						m_DefaultIcon->setToolTip("QBat - " + tr("AC adapter plugged in"));
+						m_DefaultIcon->setMessage(tr("AC adapter plugged in"));
 					else
-						m_DefaultIcon->setToolTip("QBat - " + tr("AC adapter unplugged"));
+						m_DefaultIcon->setMessage(tr("AC adapter unplugged"));
 				}
 			}
 			else {
@@ -183,7 +183,7 @@ namespace qbat {
 			checkCritical();
 		}
 		else {
-			m_DefaultIcon->setToolTip("QBat - " + tr("no information available"));
+			m_DefaultIcon->setMessage(tr("no information available"));
 			m_DefaultIcon->setVisible(true);
 		}
 		

@@ -8,6 +8,7 @@
 #include "batteryicon.h"
 #include "common.h"
 #include <QPainter>
+#include <QMessageBox>
 
 namespace qbat {
 	QDir CBatteryIcon::sysfsDir(UI_PATH_SYSFS_DIR);
@@ -18,6 +19,9 @@ namespace qbat {
 		m_Settings(settings)
 	{
 		m_Data.name = batteryName;
+		
+		connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+			this, SLOT(handleClicks(QSystemTrayIcon::ActivationReason)));
 	}
 	
 	CBatteryIcon::~CBatteryIcon() {
@@ -65,7 +69,7 @@ namespace qbat {
 	}
 	
 	void CBatteryIcon::updateToolTip() {
-		QString newToolTip = tr("QBat - %1: %2%").arg(m_Data.name) +'\n';
+		QString newToolTip = tr("%1: %2%").arg(m_Data.name) +'\n';
 		
 		if (m_Data.relativeCharge == -1)
 			newToolTip = newToolTip.arg('-');
@@ -141,7 +145,8 @@ namespace qbat {
 			if (m_Data.designCapacity)
 				newToolTip += '\n' + tr("design capacity: %1mAh").arg(m_Data.designCapacity / 1000);
 		}
-		setToolTip(newToolTip);
+		
+		setMessage(newToolTip);
 	}
 	
 	void CBatteryIcon::updateData(int currentCapacity, int fullCapacity, int designCapacity, int rate, int voltage, int status, bool energyUnits) {
@@ -223,5 +228,23 @@ namespace qbat {
 		}
 		
 		updateData(currentCapacity, fullCapacity, designCapacity, rate, voltage, status, energyUnits);
+	}
+	
+	void CBatteryIcon::setMessage(QString value) {
+		m_Message = value;
+		setToolTip(tr("QBat - %1").arg(m_Message));
+	}
+	
+	void CBatteryIcon::handleClicks(QSystemTrayIcon::ActivationReason reason) {
+		switch (reason) {
+			case Trigger:
+				if (supportsMessages())
+					showMessage(tr("QBat - Information"), m_Message);
+				else
+					QMessageBox::information(NULL, tr("QBat - Information"), m_Message);
+				break;
+			default:
+				break;
+		}
 	}
 }
