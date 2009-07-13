@@ -54,13 +54,15 @@ namespace qbat {
 		
 		m_SettingsFile.beginGroup("TrayIcons");
 		m_Settings.mergeBatteries = m_SettingsFile.value("mergeBatteries", false).toBool();
-		m_Settings.colors[UI_COLOR_PEN] = m_SettingsFile.value("textColor", 0).toUInt();
+		m_Settings.colors[UI_COLOR_PEN_CHARGE] = m_SettingsFile.value("textChargingColor", 0).toUInt();
+		m_Settings.colors[UI_COLOR_PEN_DISCHARGE] = m_SettingsFile.value("textDischargingColor", 0).toUInt();
 		m_Settings.colors[UI_COLOR_PEN_FULL] = m_SettingsFile.value("textFullColor", 0).toUInt();
 		m_Settings.colors[UI_COLOR_BRUSH_CHARGED] = m_SettingsFile.value("mainChargedColor", qRgb( 0, 255, 0)).toUInt();
 		m_Settings.colors[UI_COLOR_BRUSH_EMPTY] = m_SettingsFile.value("mainEmptyColor", qRgb(255, 255, 255)).toUInt();
 		m_Settings.colors[UI_COLOR_BRUSH_FULL] = m_SettingsFile.value("mainFullColor", m_Settings.colors[UI_COLOR_BRUSH_CHARGED]).toUInt();
-		m_Settings.colors[UI_COLOR_BRUSH_POLE] = m_SettingsFile.value("poleColor", qRgb(255, 255, 0)).toUInt();
-		m_Settings.colors[UI_COLOR_BRUSH_POLE_FULL] = m_SettingsFile.value("poleFullColor", m_Settings.colors[UI_COLOR_BRUSH_POLE]).toUInt();
+		m_Settings.colors[UI_COLOR_BRUSH_POLE_CHARGE] = m_SettingsFile.value("poleChargingColor", qRgb(255, 255, 0)).toUInt();
+		m_Settings.colors[UI_COLOR_BRUSH_POLE_DISCHARGE] = m_SettingsFile.value("poleDischargingColor", qRgb(255, 255, 0)).toUInt();
+		m_Settings.colors[UI_COLOR_BRUSH_POLE_FULL] = m_SettingsFile.value("poleFullColor", m_Settings.colors[UI_COLOR_BRUSH_POLE_CHARGE]).toUInt();
 		m_SettingsFile.endGroup();
 		
 		m_SettingsFile.beginGroup("CriticalEvent");
@@ -82,12 +84,14 @@ namespace qbat {
 		
 		m_SettingsFile.beginGroup("TrayIcons");
 		m_SettingsFile.setValue("mergeBatteries", m_Settings.mergeBatteries);
-		m_SettingsFile.setValue("textColor", m_Settings.colors[UI_COLOR_PEN]);
+		m_SettingsFile.setValue("textChargingColor", m_Settings.colors[UI_COLOR_PEN_CHARGE]);
+		m_SettingsFile.setValue("textDischargingColor", m_Settings.colors[UI_COLOR_PEN_DISCHARGE]);
 		m_SettingsFile.setValue("textFullColor", m_Settings.colors[UI_COLOR_PEN_FULL]);
 		m_SettingsFile.setValue("mainChargedColor", m_Settings.colors[UI_COLOR_BRUSH_CHARGED]);
 		m_SettingsFile.setValue("mainEmptyColor", m_Settings.colors[UI_COLOR_BRUSH_EMPTY]);
 		m_SettingsFile.setValue("mainFullColor", m_Settings.colors[UI_COLOR_BRUSH_FULL]);
-		m_SettingsFile.setValue("poleColor", m_Settings.colors[UI_COLOR_BRUSH_POLE]);
+		m_SettingsFile.setValue("poleChargingColor", m_Settings.colors[UI_COLOR_BRUSH_POLE_CHARGE]);
+		m_SettingsFile.setValue("poleDischargingColor", m_Settings.colors[UI_COLOR_BRUSH_POLE_DISCHARGE]);
 		m_SettingsFile.setValue("poleFullColor", m_Settings.colors[UI_COLOR_BRUSH_POLE_FULL]);
 		m_SettingsFile.endGroup();
 		

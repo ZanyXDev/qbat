@@ -17,9 +17,11 @@ namespace qbat {
 		colorSelectButtons.addButton(ui.mainFullColorButton, 1 + UI_COLOR_BRUSH_FULL);
 		colorSelectButtons.addButton(ui.mainChargedColorButton, 1 + UI_COLOR_BRUSH_CHARGED);
 		colorSelectButtons.addButton(ui.mainEmptyColorButton, 1 + UI_COLOR_BRUSH_EMPTY);
-		colorSelectButtons.addButton(ui.textColorButton, 1 + UI_COLOR_PEN);
+		colorSelectButtons.addButton(ui.textChargingColorButton, 1 + UI_COLOR_PEN_CHARGE);
+		colorSelectButtons.addButton(ui.textDischargingColorButton, 1 + UI_COLOR_PEN_DISCHARGE);
 		colorSelectButtons.addButton(ui.textFullColorButton, 1 + UI_COLOR_PEN_FULL);
-		colorSelectButtons.addButton(ui.poleColorButton, 1 + UI_COLOR_BRUSH_POLE);
+		colorSelectButtons.addButton(ui.poleChargingColorButton, 1 + UI_COLOR_BRUSH_POLE_CHARGE);
+		colorSelectButtons.addButton(ui.poleDischargingColorButton, 1 + UI_COLOR_BRUSH_POLE_DISCHARGE);
 		colorSelectButtons.addButton(ui.poleFullColorButton, 1 + UI_COLOR_BRUSH_POLE_FULL);
 		connect(&colorSelectButtons, SIGNAL(buttonClicked(int)), this, SLOT(editColor(int)));
 	}

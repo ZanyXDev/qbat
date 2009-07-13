@@ -31,8 +31,12 @@ namespace qbat {
 		m_Icon.fill(Qt::transparent);
 		QPainter painter(&m_Icon);
 		
-		if (m_Data.currentCapacity != m_Data.fullCapacity) {
-			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN]));
+		if (m_Data.currentCapacity != m_Data.fullCapacity || m_Data.status != UI_BATTERY_FULL) {
+			if (m_Data.status == UI_BATTERY_DISCHARGING)
+				painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN_DISCHARGE]));
+			else
+				painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN_CHARGE]));
+			
 			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_EMPTY]));
 			painter.drawRect(0, 4, 27, 23);
 			
@@ -40,7 +44,10 @@ namespace qbat {
 			
 			painter.fillRect(1, 5 + 22 - chargedPixels, 26, chargedPixels, QColor(m_Settings->colors[UI_COLOR_BRUSH_CHARGED]));
 			
-			painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_POLE]));
+			if (m_Data.status == UI_BATTERY_DISCHARGING)
+				painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_POLE_DISCHARGE]));
+			else
+				painter.setBrush(QColor(m_Settings->colors[UI_COLOR_BRUSH_POLE_CHARGE]));
 		}
 		else {
 			painter.setPen(QColor(m_Settings->colors[UI_COLOR_PEN_FULL]));

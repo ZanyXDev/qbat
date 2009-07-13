@@ -26,14 +26,16 @@
 #define UI_BATTERY_DISCHARGING          2
 #define UI_BATTERY_FULL                 3
 
-#define UI_COUNT_COLORS                 7
+#define UI_COUNT_COLORS                 9
 
-#define UI_COLOR_PEN                    0
-#define UI_COLOR_PEN_FULL               1
-#define UI_COLOR_BRUSH_CHARGED          2
-#define UI_COLOR_BRUSH_EMPTY            3
-#define UI_COLOR_BRUSH_FULL             4
-#define UI_COLOR_BRUSH_POLE             5
-#define UI_COLOR_BRUSH_POLE_FULL        6
+#define UI_COLOR_PEN_CHARGE             0
+#define UI_COLOR_PEN_DISCHARGE          1
+#define UI_COLOR_PEN_FULL               2
+#define UI_COLOR_BRUSH_CHARGED          3
+#define UI_COLOR_BRUSH_EMPTY            4
+#define UI_COLOR_BRUSH_FULL             5
+#define UI_COLOR_BRUSH_POLE_CHARGE      6
+#define UI_COLOR_BRUSH_POLE_DISCHARGE   7
+#define UI_COLOR_BRUSH_POLE_FULL        8
 
 #endif
