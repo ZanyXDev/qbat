@@ -1,3 +1,12 @@
+qbat (0.2.1) unstable; urgency=low
+
+  * .desktop file fixes
+  * added dis-/charging color settings
+  * left click on (battery-)icon shows current information
+  * added capacity loss information
+
+ -- Oliver Groß <neokensuke@freenet.de>  Wed, 15 Jul 2009 12:15:50 +0200
+
 qbat (0.2.0) unstable; urgency=low
 
   * split timers (for lower CPU usage):
