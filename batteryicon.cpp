@@ -129,8 +129,11 @@ namespace qbat {
 			if (m_Data.fullCapacity)
 				newToolTip += '\n' + tr("last full capacity: %1mWh").arg(m_Data.fullCapacity / 1000);
 			
-			if (m_Data.designCapacity)
+			if (m_Data.designCapacity) {
 				newToolTip += '\n' + tr("design capacity: %1mWh").arg(m_Data.designCapacity / 1000);
+				if (m_Data.fullCapacity < m_Data.designCapacity)
+					newToolTip += '\n' + tr("capacity loss: %1%").arg((int)((1 - (double)m_Data.fullCapacity / m_Data.designCapacity) * 100));
+			}
 		}
 		else
 		{
