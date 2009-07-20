@@ -20,6 +20,8 @@ namespace qbat {
 	{
 		m_Data.name = batteryName;
 		
+		updateIcon();
+		
 		connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
 			this, SLOT(handleClicks(QSystemTrayIcon::ActivationReason)));
 	}
