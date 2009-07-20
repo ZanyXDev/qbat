@@ -8,5 +8,5 @@ $(patsubst %,binary-install/%,$(DEB_PACKAGES)) :: binary-install/%:
 
 QMAKE=qmake-qt4 'CONFIG+=release' 'DEFINES+=QT_NO_DEBUG_OUTPUT'
 
-DEB_INSTALL_MANPAGES=res/qbat.1
+DEB_INSTALL_MANPAGES_qbat=res/qbat.1
 
