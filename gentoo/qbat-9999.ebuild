@@ -12,7 +12,10 @@ SLOT="0"
 KEYWORDS="~x86 ~amd64"
 IUSE="debug"
 
-RDEPEND=">=x11-libs/qt-4.3.2"
+RDEPEND="
+	x11-libs/qt-gui:4
+	x11-libs/qt-core:4
+"
 
 DEPEND="${RDEPEND}
 	sys-kernel/linux-headers"
@@ -52,6 +55,7 @@ src_compile() {
 
 src_install() {
 	make INSTALL_ROOT="${D}" install || die
+	doman "${S}/res/qbat.1"
 }
 
 pkg_postinst() {
