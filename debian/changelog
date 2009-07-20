@@ -1,3 +1,10 @@
+qbat (0.2.2) unstable; urgency=low
+
+  * fixed battery loss information
+  * settings are now saved by accepting the settings dialog
+
+ -- Oliver Groß <neokensuke@freenet.de>  Mon, 20 Jul 2009 14:11:05 +0200
+
 qbat (0.2.1) unstable; urgency=low
 
   * .desktop file fixes
