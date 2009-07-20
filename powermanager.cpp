@@ -43,7 +43,6 @@ namespace qbat {
 	CPowerManager::~CPowerManager() {
 		killTimer(m_Timer);
 		killTimer(m_DataTimer);
-		writeSettings();
 	}
 	
 	inline void CPowerManager::readSettings() {
@@ -314,6 +313,7 @@ namespace qbat {
 			
 			updateSupplies();
 			restartTimer();
+			writeSettings();
 		}
 	}
 	
