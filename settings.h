@@ -9,7 +9,7 @@
 #define QBAT_SETTINGS_H
 
 #include <QDialog>
-#include "ui/ui_settingsdialog.h"
+#include "ui_settingsdialog.h"
 #include "common.h"
 
 namespace qbat {
