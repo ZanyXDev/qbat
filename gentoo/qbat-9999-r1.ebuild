@@ -1,7 +1,7 @@
 
 EGIT_REPO_URI="git://repo.or.cz/qbat.git"
 
-inherit eutils flag-o-matic git
+inherit cmake-utils eutils git
 
 DESCRIPTION="QBat is a small tool based on Qt4 to display battery stats in system tray."
 HOMEPAGE="http://repo.or.cz/qbat.git"
@@ -18,17 +18,10 @@ RDEPEND="
 "
 
 DEPEND="${RDEPEND}
-	sys-kernel/linux-headers"
+	sys-kernel/linux-headers
+	dev-util/cmake"
 
 S=${WORKDIR}/${EGIT_PROJECT}
-
-pkg_setup() {
-	if ! qmake --version | grep -i qt4 ; then
-		eerror "qmake does not point to qmake-qt4"
-		die "Install qmake-qt4 and set symlinks correctly"
-	fi
-}
-
 
 src_unpack() {
 	#check version:
@@ -38,23 +31,8 @@ src_unpack() {
 	git_src_unpack
 }
 
-src_compile() {
-	cd "${S}"
-	config_defines=""
-	config_release=""
-	if use debug; then 
-		config_release="debug"
-	else
-		config_release="release"
-		config_defines="$config_defines QT_NO_DEBUG_OUTPUT"
-	fi
-	
-	qmake -recursive -Wall "CONFIG+=$config_release" "DEFINES+=$config_defines"
-	emake || die
-}
-
 src_install() {
-	make INSTALL_ROOT="${D}" install || die
+	cmake-utils_src_install
 	doman "${S}/res/qbat.1"
 }
 
