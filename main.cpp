@@ -3,12 +3,14 @@
 #include <QLibraryInfo>
 #include <QDir>
 
-#include <fly/flyhelp.h> //alex
-
 #include <cstdio>
 
 #include "powermanager.h"
 #include "constants.h"
+
+#ifndef ASTRA_VER
+#include <fly/flyhelp.h> //alex
+#endif
 
 
 using namespace qbat;

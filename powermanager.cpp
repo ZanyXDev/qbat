@@ -13,12 +13,14 @@
 #include "batteryicon.h"
 #include "qtimermessagebox.h"
 
-//#include <fly/flyfileutils.h>//alex
-#include <fly/flydeapi.h>//alex
+#ifndef ASTRA_VER
 #include <fly/flyhelp.h> //alex
-
+//#include <fly/flyfileutils.h>//alex
+//#include <fly/flydeapi.h>//alex
 //#include <X11/SM/SM.h> //alex
 //#include <X11/SM/SMlib.h> //alex
+#endif
+
 
 namespace qbat {
 	using namespace std;
@@ -59,8 +61,12 @@ namespace qbat {
 		m_SettingsFile.beginGroup("Main");
 		m_Settings.pollingRate = m_SettingsFile.value("pollingRate", 3000).toUInt();
 		m_Settings.showBalloon = m_SettingsFile.value("showBalloon", false).toBool();
-		m_Settings.autostart = flyIsAutostartEnabled("qbat");//isInAutostart("qbat"); //alex
-		m_SettingsFile.endGroup();
+
+#ifndef ASTRA_VER
+        m_Settings.autostart = flyIsAutostartEnabled("qbat");//isInAutostart("qbat"); //alex
+#endif
+
+        m_SettingsFile.endGroup();
 		
 		m_SettingsFile.beginGroup("TrayIcons");
 		m_Settings.mergeBatteries = m_SettingsFile.value("mergeBatteries", true).toBool();
@@ -299,10 +305,12 @@ namespace qbat {
 			{
 				fprintf(stderr,"cant shutdown\n");
 				//QMessageBox::warning(NULL, tr("Attention"), tr("No session manager connection"), QMessageBox::Ok);
+#ifndef ASTRA_VER
 				if (!flySendCommandToWM(QX11Info::display(),"FLYWM_SHUTDOWN\n")) 
 				{
 					//QMessageBox::warning(NULL, tr("Attention"), tr("Can't send shutdown command to fly-wm"), QMessageBox::Ok);
 				}
+#endif
 			}
 		}
 		else {
@@ -347,7 +355,7 @@ namespace qbat {
 	}
 	
 	void CPowerManager::showAbout() {
-#ifndef ORIG_ABOUT
+#ifndef ASTRA_VER
 		flyHelpShow(); //alex
 #else
 		const char * ui_name = QT_TR_NOOP("QBat - Qt Battery Monitor"); //alex
@@ -378,10 +386,13 @@ namespace qbat {
 	{
 //	  if (!sessHandle) return false;
 //	  SmcRequestSaveYourself((SmcConn)sessHandle,SmSaveBoth,true,SmInteractStyleErrors/*Any*/,True/*fast?*/,True);
-	  flySendCommandToWM(QX11Info::display(), "FLYWM_SHUTDOWN\n"); // it's not possible to get SmcConn from QSessionManager in Qt 5
+#ifndef ASTRA_VER
+        flySendCommandToWM(QX11Info::display(), "FLYWM_SHUTDOWN\n"); // it's not possible to get SmcConn from QSessionManager in Qt 5
+#endif
 	  return true;
 	}
 	//alex:
+
 	bool CPowerManager::messageReceived(const QString& s)
 	{
 	  if (s=="show")

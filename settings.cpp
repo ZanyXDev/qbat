@@ -9,8 +9,10 @@
 #include <QColorDialog>
 #include <QPushButton>
 
+#ifndef ASTRA_VER
 #include <fly/flyhelp.h>
 #include <fly/flydeapi.h> //<fly/flyfileutils.h>
+#endif
 
 namespace qbat {
 	CSettings::CSettings(QWidget * parent) : QDialog(parent) {
@@ -42,7 +44,11 @@ namespace qbat {
 	
 	CSettings::~CSettings() {}
 	
-	void CSettings::helpSlot() { flyHelpShow(); } //alex
+    void CSettings::helpSlot() {
+#ifndef ASTRA_VER
+        flyHelpShow();
+#endif
+    } //alex
 	
 	void CSettings::applySettings() {
 		m_Settings->handleCritical = ui.criticalGroup->isChecked();
@@ -63,9 +69,12 @@ namespace qbat {
 		m_Settings->mergeBatteries = ui.mergeBatteriesCheck->isChecked();
 		
 		m_Settings->showBalloon = ui.showBalloonCheck->isChecked();
-		m_Settings->autostart = ui.autostartCheck->isChecked(); //alex
-		flyEnableAutostart("qbat",m_Settings->autostart); //installInAutostart("qbat",m_Settings->autostart);//alex
-		m_Settings->standardIcons = ui.standardIconsCheck->isChecked(); //alex
+#ifndef ASTRA_VER
+        m_Settings->autostart = ui.autostartCheck->isChecked(); //alex
+        flyEnableAutostart("qbat",m_Settings->autostart); //installInAutostart("qbat",m_Settings->autostart);//alex
+        m_Settings->standardIcons = ui.standardIconsCheck->isChecked(); //alex
+#endif
+
 		m_Settings->pollingRate = ui.pollingRateSpin->value();
 	}
 	
