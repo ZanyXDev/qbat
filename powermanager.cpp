@@ -6,11 +6,19 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 #include <QtGui>
+#include <QX11Info> //alex
 #include "powermanager.h"
 #include "common.h"
 #include "settings.h"
 #include "batteryicon.h"
 #include "qtimermessagebox.h"
+
+//#include <fly/flyfileutils.h>//alex
+#include <fly/flydeapi.h>//alex
+#include <fly/flyhelp.h> //alex
+
+//#include <X11/SM/SM.h> //alex
+//#include <X11/SM/SMlib.h> //alex
 
 namespace qbat {
 	using namespace std;
@@ -24,10 +32,12 @@ namespace qbat {
 		m_CriticalHandled(false),
 		m_SettingsFile(UI_FILE_CONFIG, QSettings::IniFormat, this)
 	{
+//		sessHandle=NULL; //alex
 		readSettings();
 		m_ContextMenu.addAction(tr("&Settings"), this, SLOT(showSettings()))->setEnabled(CBatteryIcon::sysfsDir.exists());
-		m_ContextMenu.addAction(tr("&About"), this, SLOT(showAbout()));
+		m_ContextMenu.addAction(tr("&Help"), this, SLOT(showAbout())); //alex: About -> Help
 		m_ContextMenu.addSeparator();
+		m_ContextMenu.addAction(tr("&Shutdown"), this, SLOT(requestShutdown())); //alex
 		m_ContextMenu.addAction(tr("&Quit"), qApp, SLOT(quit()));
 		
 		m_DefaultIcon = new CBatteryIcon(&m_Settings, tr("merged"), this);
@@ -49,10 +59,11 @@ namespace qbat {
 		m_SettingsFile.beginGroup("Main");
 		m_Settings.pollingRate = m_SettingsFile.value("pollingRate", 3000).toUInt();
 		m_Settings.showBalloon = m_SettingsFile.value("showBalloon", false).toBool();
+		m_Settings.autostart = flyIsAutostartEnabled("qbat");//isInAutostart("qbat"); //alex
 		m_SettingsFile.endGroup();
 		
 		m_SettingsFile.beginGroup("TrayIcons");
-		m_Settings.mergeBatteries = m_SettingsFile.value("mergeBatteries", false).toBool();
+		m_Settings.mergeBatteries = m_SettingsFile.value("mergeBatteries", true).toBool();
 		m_Settings.colors[UI_COLOR_PEN_CHARGE] = m_SettingsFile.value("textChargingColor", 0).toUInt();
 		m_Settings.colors[UI_COLOR_PEN_DISCHARGE] = m_SettingsFile.value("textDischargingColor", 0).toUInt();
 		m_Settings.colors[UI_COLOR_PEN_FULL] = m_SettingsFile.value("textFullColor", 0).toUInt();
@@ -62,12 +73,14 @@ namespace qbat {
 		m_Settings.colors[UI_COLOR_BRUSH_POLE_CHARGE] = m_SettingsFile.value("poleChargingColor", qRgb(255, 255, 0)).toUInt();
 		m_Settings.colors[UI_COLOR_BRUSH_POLE_DISCHARGE] = m_SettingsFile.value("poleDischargingColor", qRgb(255, 255, 0)).toUInt();
 		m_Settings.colors[UI_COLOR_BRUSH_POLE_FULL] = m_SettingsFile.value("poleFullColor", m_Settings.colors[UI_COLOR_BRUSH_POLE_CHARGE]).toUInt();
+		m_Settings.standardIcons = m_SettingsFile.value("standardIcons",true).toBool(); //alex
 		m_SettingsFile.endGroup();
 		
 		m_SettingsFile.beginGroup("CriticalEvent");
 		m_Settings.handleCritical = m_SettingsFile.value("handle", false).toBool();
 		m_Settings.criticalCapacity = m_SettingsFile.value("criticalCapacity", 7).toUInt();
 		m_Settings.executeCommand = m_SettingsFile.value("executeCommand", false).toBool();
+		m_Settings.executeShutdown = m_SettingsFile.value("executeShutdown", false).toBool(); //alex
 		m_Settings.criticalCommand = m_SettingsFile.value("command", "").toString();
 		m_Settings.confirmCommand = m_SettingsFile.value("confirmCommand", false).toBool();
 		m_Settings.confirmWithTimeout = m_SettingsFile.value("confirmWithTimeout", false).toBool();
@@ -92,6 +105,7 @@ namespace qbat {
 		m_SettingsFile.setValue("poleChargingColor", m_Settings.colors[UI_COLOR_BRUSH_POLE_CHARGE]);
 		m_SettingsFile.setValue("poleDischargingColor", m_Settings.colors[UI_COLOR_BRUSH_POLE_DISCHARGE]);
 		m_SettingsFile.setValue("poleFullColor", m_Settings.colors[UI_COLOR_BRUSH_POLE_FULL]);
+		m_SettingsFile.setValue("standardIcons", m_Settings.standardIcons);
 		m_SettingsFile.endGroup();
 		
 		m_SettingsFile.beginGroup("CriticalEvent");
@@ -125,17 +139,17 @@ namespace qbat {
 			foreach(QString i, powerSupplies) {
 				// this is possibly not very reliable
 				if (CBatteryIcon::sysfsDir.exists(i + "/online")) {
-					if (readIntSysFile(CBatteryIcon::sysfsDir.filePath(i + "/online").toAscii().constData()) == 1) {
+					if (readIntSysFile(CBatteryIcon::sysfsDir.filePath(i + "/online").toLatin1().constData()) == 1) {
 						m_ACPlug = true;
 						m_CriticalHandled = false;
 					}
 				}
-				else {
+				/*else*/ {
 					if (m_BatteryIcons.contains(i)) {
 						currentBatteryIcon = m_BatteryIcons.take(i);
 					}
 					else {
-// 						qDebug("new battery: %s", i.toAscii().constData());
+// 						qDebug("new battery: %s", i.toLatin1().constData());
 						currentBatteryIcon = new CBatteryIcon(&m_Settings, i, this);
 						currentBatteryIcon->setContextMenu(&m_ContextMenu);
 						currentBatteryIcon->updateData();
@@ -167,7 +181,10 @@ namespace qbat {
 			if (m_BatteryIcons.isEmpty()) {
 				if (!m_DefaultIcon->isVisible()) {
 					m_DefaultIcon->setVisible(true);
-					m_DefaultIcon->setIcon(QIcon(UI_ICON_QBAT_SMALL));
+					
+					QIcon ico = QIcon::fromTheme("qbat");
+					if (ico.isNull()) ico = QIcon(UI_ICON_QBAT_SMALL);
+					m_DefaultIcon->setIcon(ico);
 					
 					if (m_ACPlug)
 						m_DefaultIcon->setMessage(tr("AC adapter plugged in"));
@@ -276,6 +293,18 @@ namespace qbat {
 		if (m_Settings.executeCommand && (!m_Settings.confirmCommand || (QTimerMessageBox::warning(NULL, msgTitle, msgText,
 			(m_Settings.confirmWithTimeout) ? m_Settings.timeoutValue : -1, QMessageBox::Ok | QMessageBox::Cancel))))
 			QProcess::startDetached(m_Settings.criticalCommand);
+		if (m_Settings.executeShutdown) //alex
+		{
+			if (!requestShutdown())
+			{
+				fprintf(stderr,"cant shutdown\n");
+				//QMessageBox::warning(NULL, tr("Attention"), tr("No session manager connection"), QMessageBox::Ok);
+				if (!flySendCommandToWM(QX11Info::display(),"FLYWM_SHUTDOWN\n")) 
+				{
+					//QMessageBox::warning(NULL, tr("Attention"), tr("Can't send shutdown command to fly-wm"), QMessageBox::Ok);
+				}
+			}
+		}
 		else {
 			if (m_Settings.showBalloon)
 				m_BatteryIcons.begin().value()->showMessage(msgTitle, msgText, QSystemTrayIcon::Warning, 7000);
@@ -318,12 +347,16 @@ namespace qbat {
 	}
 	
 	void CPowerManager::showAbout() {
+#ifndef ORIG_ABOUT
+		flyHelpShow(); //alex
+#else
+		const char * ui_name = QT_TR_NOOP("QBat - Qt Battery Monitor"); //alex
 		if (m_Settings.showBalloon) {
 			if (m_DefaultIcon->isVisible())
-				m_DefaultIcon->showMessage(tr("About QBat"), UI_NAME + "\nv" + QString(UI_VERSION),
+				m_DefaultIcon->showMessage(tr("About QBat"), /*UI_NAME*/tr(ui_name) + "\nv" + QString(UI_VERSION), //alex
 					QSystemTrayIcon::Information, 4000);
 			else
-				m_BatteryIcons.begin().value()->showMessage(tr("About QBat"), UI_NAME + "\nv" + QString(UI_VERSION),
+				m_BatteryIcons.begin().value()->showMessage(tr("About QBat"), /*UI_NAME*/tr(ui_name) + "\nv" + QString(UI_VERSION), //alex
 					QSystemTrayIcon::Information, 4000);
 		}
 		else {
@@ -332,10 +365,41 @@ namespace qbat {
 			aboutBox.setWindowIcon(QIcon(UI_ICON_QBAT_SMALL));
 			aboutBox.setIconPixmap(QPixmap(UI_ICON_QBAT_LARGE));
 			aboutBox.setWindowTitle(tr("About QBat"));
-			aboutBox.setText(UI_NAME + "\nv" + QString(UI_VERSION));
+			aboutBox.setText(/*UI_NAME*/tr(ui_name) + "\nv" + QString(UI_VERSION)); //alex
 			aboutBox.setStandardButtons(QMessageBox::Ok);
 			
 			aboutBox.exec();
 		}
+#endif
+	}
+//alex:
+//	void CPowerManager::sessSlot(QSessionManager& sm) { sessHandle = sm.handle(); }
+	bool CPowerManager::requestShutdown()
+	{
+//	  if (!sessHandle) return false;
+//	  SmcRequestSaveYourself((SmcConn)sessHandle,SmSaveBoth,true,SmInteractStyleErrors/*Any*/,True/*fast?*/,True);
+	  flySendCommandToWM(QX11Info::display(), "FLYWM_SHUTDOWN\n"); // it's not possible to get SmcConn from QSessionManager in Qt 5
+	  return true;
+	}
+	//alex:
+	bool CPowerManager::messageReceived(const QString& s)
+	{
+	  if (s=="show")
+	  {
+	    if (m_BatteryIcons.isEmpty())
+	    {
+		if (m_DefaultIcon->isVisible()) 
+		    m_DefaultIcon->handleClicks(QSystemTrayIcon::Trigger);
+	    }
+	    else if (m_BatteryIcons.begin().value()->isVisible())
+	    {
+		m_BatteryIcons.begin().value()->updateData();
+		m_BatteryIcons.begin().value()->updateIcon();
+		m_BatteryIcons.begin().value()->updateToolTip();
+		m_BatteryIcons.begin().value()->handleClicks(QSystemTrayIcon::Trigger);
+	    }
+	    return true;
+	  }
+	  return false;
 	}
 }

@@ -30,6 +30,7 @@ namespace qbat {
 		bool execute(Settings * settings);
 	private slots:
 		void editColor(int id);
+		void helpSlot(); //alex
 	};
 }
 

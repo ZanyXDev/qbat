@@ -7,11 +7,18 @@
 //
 #include "settings.h"
 #include <QColorDialog>
+#include <QPushButton>
+
+#include <fly/flyhelp.h>
+#include <fly/flydeapi.h> //<fly/flyfileutils.h>
 
 namespace qbat {
 	CSettings::CSettings(QWidget * parent) : QDialog(parent) {
 		ui.setupUi(this);
-		setWindowIcon(QIcon(UI_ICON_QBAT_SMALL));
+
+		QIcon ico = QIcon::fromTheme("qbat");
+		if (ico.isNull()) ico = QIcon(UI_ICON_QBAT_SMALL);
+		setWindowIcon(ico);
 		
 		colorSelectButtons.setExclusive(false);
 		colorSelectButtons.addButton(ui.mainFullColorButton, 1 + UI_COLOR_BRUSH_FULL);
@@ -24,9 +31,18 @@ namespace qbat {
 		colorSelectButtons.addButton(ui.poleDischargingColorButton, 1 + UI_COLOR_BRUSH_POLE_DISCHARGE);
 		colorSelectButtons.addButton(ui.poleFullColorButton, 1 + UI_COLOR_BRUSH_POLE_FULL);
 		connect(&colorSelectButtons, SIGNAL(buttonClicked(int)), this, SLOT(editColor(int)));
+	
+		QPushButton *hbtn = ui.buttonBox->button(QDialogButtonBox::Help); //alex
+		if (hbtn)  //alex
+		{
+		connect(hbtn,SIGNAL(clicked()),this,SLOT(helpSlot()));
+		hbtn->setShortcut(QKeySequence::HelpContents);
+		}
 	}
 	
 	CSettings::~CSettings() {}
+	
+	void CSettings::helpSlot() { flyHelpShow(); } //alex
 	
 	void CSettings::applySettings() {
 		m_Settings->handleCritical = ui.criticalGroup->isChecked();
@@ -35,6 +51,8 @@ namespace qbat {
 		m_Settings->executeCommand = ui.criticalCommandRadio->isChecked();
 		m_Settings->criticalCommand = ui.criticalCommandEdit->text();
 		
+		m_Settings->executeShutdown = ui.criticalShutdownRadio->isChecked(); //alex
+
 		m_Settings->confirmCommand = ui.confirmCommandBox->isChecked();
 		m_Settings->confirmWithTimeout = ui.timeoutCheck->isChecked();
 		m_Settings->timeoutValue = ui.timeoutSpin->value();
@@ -45,6 +63,9 @@ namespace qbat {
 		m_Settings->mergeBatteries = ui.mergeBatteriesCheck->isChecked();
 		
 		m_Settings->showBalloon = ui.showBalloonCheck->isChecked();
+		m_Settings->autostart = ui.autostartCheck->isChecked(); //alex
+		flyEnableAutostart("qbat",m_Settings->autostart); //installInAutostart("qbat",m_Settings->autostart);//alex
+		m_Settings->standardIcons = ui.standardIconsCheck->isChecked(); //alex
 		m_Settings->pollingRate = ui.pollingRateSpin->value();
 	}
 	
@@ -54,6 +75,8 @@ namespace qbat {
 		
 		if (settings->executeCommand)
 			ui.criticalCommandRadio->setChecked(true);
+		if (settings->executeShutdown) //alex
+			ui.criticalShutdownRadio->setChecked(true);
 		else
 			ui.criticalWarningRadio->setChecked(true);
 		
@@ -75,7 +98,9 @@ namespace qbat {
 		
 		ui.pollingRateSpin->setValue(settings->pollingRate);
 		ui.showBalloonCheck->setChecked(settings->showBalloon);
-		
+		ui.autostartCheck->setChecked(settings->autostart); //alex
+		ui.standardIconsCheck->setChecked(settings->standardIcons); //alex
+
 		m_Settings = settings;
 		
 		if (exec()) {

@@ -7,5 +7,12 @@ GenericName=Qt Battery Monitor
 Icon=/usr/share/qbat/icons/qbat.png
 MimeType=
 Name=QBat
+Name[ru]=Монитор батарей QBat
+Comment=QBat is batery monitor program
+Comment[ru]=Программа QBat для мониторинга батарей
+
 Terminal=false
 Type=Application
+
+X-SuSE-YaST-Group=Hardware
+X-SuSE-YaST-RootOnly=false

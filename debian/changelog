@@ -1,3 +1,85 @@
+qbat (0.2.2astra18) unstable; urgency=medium
+  * try to get qbat apps icon from theme
+ -- Alexander Smirnov <support@rusbitech.ru>  Tue, 24 Oct 2017 19:52:40 +0300
+qbat (0.2.2astra17) unstable; urgency=medium
+  * merge batteries by default
+  * create battery icons in spite of /sys/class/power_supply/.../online file
+ -- Alexander Smirnov <support@rusbitech.ru>  Thu, 05 Oct 2017 17:31:31 +0300
+qbat (0.2.2astra16) unstable; urgency=medium
+  * use fly help simple  API
+ -- Alexander Smirnov <support@rusbitech.ru>  Thu, 25 May 2017 15:27:26 +0300
+qbat (0.2.2astra15) unstable; urgency=medium
+  * rebuild
+ -- Alexander Smirnov <support@rusbitech.ru>  Thu, 23 Mar 2017 20:46:11 +0300
+qbat (0.2.2-astra14) unstable; urgency=low
+  * rules fix
+ -- Alexander Smirnov <support@rusbitech.ru>  Fri, 06 May 2016 18:15:32 +0300
+qbat (0.2.2-astra13) unstable; urgency=low
+  * second call qbat => show tooltip
+ -- Alexander Smirnov <support@rusbitech.ru>  Mon, 21 Sep 2015 18:45:04 +0300
+qbat (0.2.2-astra12) unstable; urgency=low
+  * sony tablet z, kernel 3.4: check if rate > 0
+  * sony tablet z, kernel 3.4: check if get 'capacity'<=100 use it, dont use wrong charge_now
+ -- Alexander Smirnov <support@rusbitech.ru>  Fri, 05 Jun 2015 18:45:04 +0300
+qbat (0.2.2-astra10) unstable; urgency=low
+  * check if can't get fullCapacity from charge_full file,then currentCapacity (charge_now) may be in percents
+ -- Alexander Smirnov <support@rusbitech.ru>  Fri, 03 Apr 2015 18:45:04 +0300
+qbat (0.2.2-astra9) unstable; urgency=low
+  * option to use standard theme icons if available
+  * resize painted tray icon to 64x64
+ -- Alexander Smirnov <support@rusbitech.ru>  Wed, 18 Mar 2015 18:45:04 +0300
+qbat (0.2.2-astra8) unstable; urgency=low
+  * build fix
+ -- Alexander Smirnov <support@rusbitech.ru>  Wed,  2 Jul 2014 17:45:04 +0400
+qbat (0.2.2-astra7) unstable; urgency=low
+  * fly help
+ -- Alexander Smirnov <support@rusbitech.ru>  Thu, 19 Jun 2014 17:45:04 +0400
+qbat (0.2.2-astra6) unstable; urgency=low
+  * libqt5x11extras5-dev
+ -- Alexander Smirnov <support@rusbitech.ru>  Thu, 06 Mar 2014 17:45:04 +0400
+qbat (0.2.2-astra5) unstable; urgency=low
+  * buildfix
+  * new public API flydeapi.h
+ -- Alexander Smirnov <support@rusbitech.ru>  Tue, 28 Jan 2014 15:49:28 +0400
+qbat (0.2.2-astra4) unstable; urgency=low
+  * Port to Qt 5
+ -- Alexander Volkov <support@rusbitech.ru>  Fri, 13 Dec 2013 14:14:55 +0400
+qbat (0.2.2-astra3) unstable; urgency=low
+  * buildfix
+ -- Alexander Smirnov <rusbitech@mail.ru>  Tue, 26 Feb 2013 18:03:45 +0300
+qbat (0.2.2-astra2) unstable; urgency=low
+  * buildfix
+ -- Alexander Smirnov <rusbitech@mail.ru>  Thu, 31 Jan 2013 18:03:45 +0300
+qbat (0.2.2-astra1) unstable; urgency=low
+  * Comment added to desktop file
+ -- Alexander Smirnov <rusbitech@mail.ru>  Thu, 11 Oct 2012 18:03:45 +0300
+qbat (0.2.2-astra0) unstable; urgency=low
+  * sync with original
+ -- Alexander Smirnov <rusbitech@mail.ru>  Tue, 10 Jul 2012 18:03:45 +0300
+qbat (0.1.8-astra7) unstable; urgency=low
+  * session management stuff
+ -- Alexander Smirnov <sja@mail.ru>  Sat,  7 May 2009 18:03:45 +0300
+qbat (0.1.8-astra6) unstable; urgency=low
+  * fix autostart
+ -- Alexander Smirnov <sja@mail.ru>  Thu, 24 Sep 2009 18:03:45 +0300
+qbat (0.1.8-astra5) unstable; urgency=low
+  * dependencies fixed
+ -- Alexander Smirnov <sja@mail.ru>  Thu, 23 Jul 2009 18:03:45 +0300
+qbat (0.1.8-astra4) unstable; urgency=low
+  * translation enhanced
+ -- Alexander Smirnov <sja@mail.ru>  Mon, 15 May 2009 18:03:45 +0300
+qbat (0.1.8-astra3) unstable; urgency=low
+  * signle application check
+ -- Alexander Smirnov <sja@mail.ru>  Wed,  6 May 2009 18:03:45 +0300
+qbat (0.1.8-astra2) unstable; urgency=low
+  * translation fixes
+  * autostart option
+ -- Alexander Smirnov <sja@mail.ru>  Wed, 22 Apr 2009 14:03:45 +0300
+qbat (0.1.8-astra1) unstable; urgency=low
+  * first astra-build with minor fixes
+ -- Alexander Smirnov <sja@mail.ru>  Mon, 20 Apr 2009 20:03:45 +0300
+
+
 qbat (0.2.2) unstable; urgency=low
 
   * fixed battery loss information

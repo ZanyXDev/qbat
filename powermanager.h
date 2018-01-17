@@ -8,6 +8,7 @@
 #ifndef QBAT_POWERMANAGER_H
 #define QBAT_POWERMANAGER_H
 
+#include <QApplication> //alex
 #include <QHash>
 #include <QMenu>
 #include <QSettings>
@@ -38,6 +39,7 @@ namespace qbat {
 		inline void writeSettings();
 		
 		void timerEvent(QTimerEvent * event);
+//		void *sessHandle; //alex
 	public:
 		CPowerManager(QObject * parent = 0);
 		~CPowerManager();
@@ -49,8 +51,11 @@ namespace qbat {
 		void updateBatteryData();
 		void restartTimer();
 	public slots:
+		bool messageReceived(const QString&);
 		void showSettings();
 		void showAbout();
+//		void sessSlot(QSessionManager&); //alex
+		bool requestShutdown();//alex
 	};
 }
 

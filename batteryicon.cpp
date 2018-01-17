@@ -16,6 +16,7 @@ namespace qbat {
 	CBatteryIcon::CBatteryIcon(Settings * settings, QString batteryName, QObject * parent) :
 		QSystemTrayIcon(parent),
 		m_Icon(28, 28),
+		m_IconName(""), //alex
 		m_Settings(settings)
 	{
 		m_Data.name = batteryName;
@@ -30,6 +31,37 @@ namespace qbat {
 	}
 	
 	void CBatteryIcon::updateIcon() {
+	    if (m_Settings->standardIcons) //alex
+	    {
+	        //name is "battery[-charging][-percent]", where percent may be "caution",low,40,60,80,100 or ""
+		QString m_IconName, charging, percent;
+
+		if (m_Data.status == UI_BATTERY_CHARGING) charging="-charging";
+		if (m_Data.relativeCharge <= 100)
+		{
+			 if (m_Data.relativeCharge< 0) percent="-caution";//-1 is smth. wrong?
+		    else if (m_Data.relativeCharge<20) percent="-low";  //00-20
+		    else if (m_Data.relativeCharge<40) percent="-040";  //20-40
+		    else if (m_Data.relativeCharge<60) percent="-060";  //40-60
+		    else if (m_Data.relativeCharge<80) percent="-080";  //60-80
+		    else if (m_Data.relativeCharge<=100) 
+		      percent=((m_Data.status==UI_BATTERY_DISCHARGING || m_Data.status==UI_BATTERY_FULL)?"-100":""); //80-100
+		}
+		else
+		{
+		  //>100 is the same as 100?
+		  if (m_Data.relativeCharge<=100) 
+		    percent=((m_Data.status==UI_BATTERY_DISCHARGING || m_Data.status==UI_BATTERY_FULL)?"-100":"");
+		}
+		m_IconName = QString("battery")+charging+percent;
+		QIcon ico = QIcon::fromTheme(m_IconName);
+		if (ico.isNull()) goto draw_it;
+		setIcon(ico);
+		//fprintf(stderr,"set icon=%s rel=%d\n",m_IconName.toLocal8Bit().data(),m_Data.relativeCharge);
+	    }
+	    else
+	    {
+draw_it:
 		m_Icon.fill(Qt::transparent);
 		QPainter painter(&m_Icon);
 		
@@ -74,7 +106,8 @@ namespace qbat {
 		else
 			painter.drawText(1, 9, 26, 16, Qt::AlignHCenter, QString::number(m_Data.relativeCharge));
 		
-		setIcon(m_Icon);
+		setIcon(m_Icon.scaled(QSize(128,128))); //alex
+	    }
 	}
 	
 	void CBatteryIcon::updateToolTip() {
@@ -88,7 +121,7 @@ namespace qbat {
 		switch (m_Data.status) {
 		case UI_BATTERY_DISCHARGING:
 			newToolTip += tr("status: %1").arg(tr("discharging"));
-			if (m_Data.rate) {
+			if (m_Data.rate>0 && m_Data.fullCapacity>100) { //alex: if fullCap not in percents
 				newToolTip += '\n';
 				qreal remainingTime  = (qreal)(m_Data.currentCapacity) / m_Data.rate;
 				int remainingHours   = (int)remainingTime;
@@ -98,7 +131,7 @@ namespace qbat {
 			break;
 		case UI_BATTERY_CHARGING:
 			newToolTip += tr("status: %1").arg(tr("charging"));
-			if (m_Data.rate && m_Data.fullCapacity) {
+			if (m_Data.rate>0 && m_Data.fullCapacity>100) { //alex: if fullCap not in percents
 				newToolTip += '\n';
 				qreal remainingTime  = (qreal)(m_Data.fullCapacity - m_Data.currentCapacity) / m_Data.rate;
 				int remainingHours   = (int)remainingTime;
@@ -116,7 +149,7 @@ namespace qbat {
 		newToolTip += '\n';
 		
 		if (m_Data.energyUnits) {
-			if ((m_Data.rate) && (m_Data.status != UI_BATTERY_FULL)) {
+			if ((m_Data.rate>0) && (m_Data.status != UI_BATTERY_FULL)) {
 				double rateW = qRound(m_Data.rate / 100000.0) / 10.0;
 				if (m_Data.voltage) {
 					double rateA = qRound((m_Data.rate / m_Data.voltage) / 1000.0) / 10.0;
@@ -126,9 +159,10 @@ namespace qbat {
 					newToolTip += tr("current rate: %1W").arg(rateW) + '\n';
 			}
 			
+			if (m_Data.fullCapacity>100) //alex: if fullCap not in percents
 			newToolTip += tr("current capacity: %1mWh").arg(m_Data.currentCapacity / 1000);
 			
-			if (m_Data.fullCapacity)
+			if (m_Data.fullCapacity>100)
 				newToolTip += '\n' + tr("last full capacity: %1mWh").arg(m_Data.fullCapacity / 1000);
 			
 			if (m_Data.designCapacity)
@@ -136,19 +170,23 @@ namespace qbat {
 		}
 		else
 		{
-			if ((m_Data.rate) && (m_Data.status != UI_BATTERY_FULL)) {
+			if ((m_Data.rate>0) && (m_Data.status != UI_BATTERY_FULL)) {
 				double rateA = m_Data.rate / 100000.0;
 				if (m_Data.voltage) {
 					double rateW = qRound(rateA * m_Data.voltage / 100.0) / 10.0;
+					if (rateW>0 && rateA>0) //alex
 					newToolTip += tr("current rate: %1W / %2A").arg(rateW).arg(qRound(rateA) / 10.0) + '\n';
 				}
-				else
+				else {
+					if (rateA>0) //alex
 					newToolTip += tr("current rate: %1A").arg(qRound(rateA) / 10.0) + '\n';
+				}
 			}
 			
+			if (m_Data.fullCapacity>100) //alex: if fullCap not in percents
 			newToolTip += tr("current capacity: %1mAh").arg(m_Data.currentCapacity / 1000);
 			
-			if (m_Data.fullCapacity)
+			if (m_Data.fullCapacity>100) //alex: if fullCap not in percents
 				newToolTip += '\n' + tr("last full capacity: %1mAh").arg(m_Data.fullCapacity / 1000);
 			
 			if (m_Data.designCapacity)
@@ -163,6 +201,8 @@ namespace qbat {
 	
 	void CBatteryIcon::updateData(int currentCapacity, int fullCapacity, int designCapacity, int rate, int voltage, int status, bool energyUnits) {
 		m_Data.energyUnits = energyUnits;
+		
+		bool statusUpdated=false; //alex
 		
 		bool noupdate = true;
 		
@@ -179,6 +219,7 @@ namespace qbat {
 		if (status != m_Data.status) {
 			noupdate = false;
 			m_Data.status = status;
+			statusUpdated=true; //alex
 		}
 		
 		if (fullCapacity != m_Data.fullCapacity) {
@@ -201,7 +242,7 @@ namespace qbat {
 		
 		qint8 newRelativeCharge = calcRelativeDef(currentCapacity, fullCapacity);
 		
-		if (newRelativeCharge != m_Data.relativeCharge) {
+		if (newRelativeCharge != m_Data.relativeCharge || statusUpdated) { //alex: add status check
 			m_Data.relativeCharge = newRelativeCharge;
 			
 			if (isVisible())
@@ -221,24 +262,33 @@ namespace qbat {
 		int status = 0;
 		bool energyUnits = sysfsDir.exists(m_Data.name + UI_CAPTION_NOW(UI_CAPTION_ENERGY));
 		
-		rate = readIntSysFile(sysfsDir.filePath(m_Data.name + "/current_now").toAscii().constData());
-		voltage = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_NOW(UI_CAPTION_VOLTAGE)).toAscii().constData()) / 10000;
+		rate = readIntSysFile(sysfsDir.filePath(m_Data.name + "/current_now").toLatin1().constData());
+		voltage = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_NOW(UI_CAPTION_VOLTAGE)).toLatin1().constData()) / 10000;
 		
 		char buffer[BUF_SIZE];
-		readStringFromFile(buffer, sysfsDir.filePath(m_Data.name + "/status").toAscii().constData());
+		readStringFromFile(buffer, sysfsDir.filePath(m_Data.name + "/status").toLatin1().constData());
 		status = toStatusInt(buffer);
 		
 		if (energyUnits) {
-			fullCapacity    = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_FULL(UI_CAPTION_ENERGY)).toAscii().constData());
-			designCapacity  = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_DESIGN(UI_CAPTION_ENERGY)).toAscii().constData());
-			currentCapacity = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_NOW(UI_CAPTION_ENERGY)).toAscii().constData());
+			fullCapacity    = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_FULL(UI_CAPTION_ENERGY)).toLatin1().constData());
+			designCapacity  = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_DESIGN(UI_CAPTION_ENERGY)).toLatin1().constData());
+			currentCapacity = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_NOW(UI_CAPTION_ENERGY)).toLatin1().constData());
 		}
 		else {
-			fullCapacity    = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_FULL(UI_CAPTION_CHARGE)).toAscii().constData());
-			designCapacity  = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_DESIGN(UI_CAPTION_CHARGE)).toAscii().constData());
-			currentCapacity = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_NOW(UI_CAPTION_CHARGE)).toAscii().constData());
+			fullCapacity    = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_FULL(UI_CAPTION_CHARGE)).toLatin1().constData());
+			designCapacity  = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_DESIGN(UI_CAPTION_CHARGE)).toLatin1().constData());
+			currentCapacity = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_NOW(UI_CAPTION_CHARGE)).toLatin1().constData());
+			int capacityProbe  = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_CAPACITY).toLatin1().constData());
+			if (fullCapacity==0 ) //alex
+			{
+			  currentCapacity = readIntSysFile(sysfsDir.filePath(m_Data.name + UI_CAPTION_CAPACITY).toLatin1().constData());
+			  fullCapacity=100;
+			}
+			else if (capacityProbe<=100) //alex: kernel 3.4 on sony tablet z: 'capacity' field in percents, current capacity iws smth wrong
+			{
+			  currentCapacity =  fullCapacity * capacityProbe / 100;
+			}
 		}
-		
 		updateData(currentCapacity, fullCapacity, designCapacity, rate, voltage, status, energyUnits);
 	}
 	

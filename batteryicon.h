@@ -59,12 +59,13 @@ namespace qbat {
 	private:
 		QString m_BatteryName;
 		QPixmap m_Icon;
+		QString m_IconName; //alex
 		Settings * m_Settings;
 		
 		QString m_Message;
 		
 		BatteryData m_Data;
-	private slots:
+	public slots:
 		void handleClicks(QSystemTrayIcon::ActivationReason reason);
 	};
 }

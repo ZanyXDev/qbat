@@ -2,7 +2,14 @@ Source: qbat
 Section: utils
 Priority: extra
 Maintainer: Oliver Groß <neokensuke@freenet.de>
-Build-Depends: cdbs, debhelper (>= 5), qt4-dev-tools, libqt4-dev
+Build-Depends: cdbs,
+               debhelper (>= 7),
+               libflycore-dev ( >= 2.2.7-37),
+               pkg-config,
+               qtbase5-dev,
+               libqt5x11extras5-dev,
+               libqtsingleapplication-dev,
+               libflyintegration-dev
 Standards-Version: 3.8.2
 Homepage: http://repo.or.cz/w/qbat.git
 

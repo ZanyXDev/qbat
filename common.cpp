@@ -35,8 +35,8 @@ namespace qbat {
 	
 	int readIntSysFile(const char * fileName) {
 		char buffer[BUF_SIZE];
-		readStringFromFile(buffer, fileName);
-		return atoi(buffer);
+		if (readStringFromFile(buffer, fileName)) return atoi(buffer);
+		return 0;
 	}
 	
 	int toStatusInt(const char * status) {

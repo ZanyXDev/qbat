@@ -20,6 +20,7 @@ namespace qbat {
 		bool handleCritical;
 		quint8 criticalCapacity;
 		bool executeCommand;
+		bool executeShutdown; //alex
 		QString criticalCommand;
 		bool confirmCommand;
 		bool confirmWithTimeout;
@@ -27,6 +28,8 @@ namespace qbat {
 		QRgb colors[UI_COUNT_COLORS];
 		bool showBalloon;
 		bool mergeBatteries;
+		bool autostart; //alex
+		bool standardIcons; //alex
 	};
 	
 	bool readStringFromFile(char * buffer, const char * fileName);
