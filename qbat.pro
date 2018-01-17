@@ -2,11 +2,12 @@ TEMPLATE = app
 TARGET = qbat
 
 QT += widgets x11extras
+include($$PWD/..//qt-solutions/qtsingleapplication/src/qtsingleapplication.pri)
+//CONFIG += qtsingleapplication
 
-CONFIG += qtsingleapplication
-
-CONFIG   += link_pkgconfig
-PKGCONFIG = flyintegration
+INCLUDEPATH += $$PWD/..//qt-solutions/qtsingleapplication/src/
+#CONFIG   += link_pkgconfig
+#PKGCONFIG = flyintegration
 
 
 CODECFORSRC = UTF-8
@@ -18,7 +19,7 @@ UI_DIR = ui/
 
 #alex:
 #LIBS += -lflycore -lflyui -lflyuiextra -lSM
-LIBS += -lflycore
+#LIBS += -lflycore
 
 TRANSLATIONS = qbat_ru.ts
 
