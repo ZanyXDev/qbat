@@ -1,6 +1,9 @@
 #ifndef QBAT_CONSTANTS_H
 #define QBAT_CONSTANTS_H
 
+#define ORIG_ABOUT
+#define ASTRA_VER
+
 #define UI_VERSION                      "0.2.2"
 //#define UI_NAME                         tr("QBat - Qt Battery Monitor") alex
 
